@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Yunhao Luo — character animation, physics simulation, and other random ideas, presented as an HD-2D souls-like hub world." />
+  <title>Yunhao Luo - AI Researcher</title>
+  <meta name="google-site-verification" content="79AHx_qZJGgivSsQJ_ldgqcRBrHxNxdZlD_nFyS4aI8" />
+  <link rel="canonical" href="https://himeragiyukina.github.io/" />
+  <!-- social share cards -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Yunhao Luo - AI Researcher" />
+  <meta property="og:description" content="Character animation, physics simulation, AI agents, and other random ideas — presented as an HD-2D souls-like hub world." />
+  <meta property="og:url" content="https://himeragiyukina.github.io/" />
+  <meta property="og:image" content="https://himeragiyukina.github.io/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- who this site belongs to, for search engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Yunhao Luo",
+    "url": "https://himeragiyukina.github.io/",
+    "jobTitle": "AI Researcher",
+    "worksFor": { "@type": "Organization", "name": "Huawei" },
+    "alumniOf": { "@type": "CollegeOrUniversity", "name": "McGill University" },
+    "knowsAbout": ["AI agents", "web agents", "GUI agents", "UI generation", "character animation", "physics simulation", "real-time rendering", "GPU fluid simulation"],
+    "sameAs": [
+      "https://github.com/HimeragiYukina",
+      "https://www.linkedin.com/in/yunhao-luo-853b16234/",
+      "https://orcid.org/0000-0003-2254-4394"
+    ]
+  }
+  </script>
+  <!-- Cinzel / EB Garamond are self-hosted via @font-face in style.css -->
+  <link rel="icon" type="image/png" href="/favicon.png" />
+</head>
+<body>
+  <!-- static summary for crawlers that don't execute JS (the app itself
+       renders everything below into #app) -->
+  <noscript>
+    <h1>Yunhao Luo — AI Researcher</h1>
+    <p>
+      I am Yunhao Luo, a AI researcher at Huawei's Web Technology Lab, working on AI agents —
+      web agents, GUI agents, and website / UI generation — with a foundation in character animation,
+      physics simulation, and real-time rendering. I previously researched real-time GPU fluid
+      simulation at Ubisoft La Forge and hold an M.Sc. in Computer Science from McGill University;
+      my thesis work received the Best Presentation Award at MIG '21.
+    </p>
+    <p>
+      This site is an interactive HD-2D hub world (it needs JavaScript). Its areas: Projects
+      (a real-time GPU liquid simulator built at Ubisoft Montreal), Research (the MIG '21 publication
+      "Catching and Throwing Control of a Physically Simulated Hand"), Mods (Mizuki Mod — a complete
+      Slay the Spire character), a poetry Zine, and About.
+    </p>
+    <p>
+      Elsewhere: <a href="https://github.com/HimeragiYukina">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/yunhao-luo-853b16234/">LinkedIn</a> ·
+      <a href="https://orcid.org/0000-0003-2254-4394">ORCID</a>
+    </p>
+  </noscript>
+  <div id="app">
+    <!-- The active level mounts into #stage -->
+    <div id="stage"></div>
+    <!-- Full-screen fade used for level transitions -->
+    <div id="fader"></div>
+    <!-- Souls-style area-name banner -->
+    <div id="banner"><div id="banner-text"></div><div id="banner-rule"></div></div>
+    <!-- WebMCP status chip -->
+    <div id="mcp-chip" title="">✦ WebMCP</div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

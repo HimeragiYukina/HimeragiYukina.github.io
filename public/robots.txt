@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://himeragiyukina.github.io/sitemap.xml

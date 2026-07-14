@@ -1,0 +1,22 @@
+# Yunhao Luo — Personal Website
+
+> The personal site of Yunhao Luo, a AI researcher working on AI agents, character animation, physics simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Dark-Souls-flavoured hub world ("Crepusculum Dream") where each landmark leads to an area of content.
+
+Yunhao Luo is a AI researcher at Huawei's Web Technology Lab. He previously researched real-time GPU fluid simulation at Ubisoft La Forge and holds an M.Sc. in Computer Science from McGill University; his thesis work received the Best Presentation Award at MIG '21.
+
+For AI agents: this site registers WebMCP tools on `document.modelContext` (list-site-pages, get-about-me, goto-site-page, set-language, walk-hero-to-landmark, get-hero-status, get-publications, get-citation). An agent in a WebMCP-capable browser can operate the site directly — jump between pages, switch language, walk the hero, read the bio and structured publication data, and get the citation.
+
+## Areas
+
+- [Home](/#/): the explorable HD-2D hub world; every landmark below lives here
+- [Projects](/#/projects): write-up and captured demos of the real-time GPU liquid simulator built at Ubisoft Montreal (position-based fluids on compute shaders, now part of the Anvil engine)
+- [Research](/#/research): first-author publication — Catching and Throwing Control of a Physically Simulated Hand (MIG '21, Best Presentation Award), with abstract, BibTeX, and links
+- [Mods](/#/mods): Mizuki Mod — a complete custom Slay the Spire character (78 cards, custom mechanics, Spine-animated sprite)
+- [Zine](/#/zine): a modern-poetry zine, presented as readable pages
+- [About](/#/about): bio, interests, photography, and the site's WebMCP tool documentation
+
+## External
+
+- [GitHub](https://github.com/HimeragiYukina)
+- [LinkedIn](https://www.linkedin.com/in/yunhao-luo-853b16234/)
+- [Publication project page](https://profs.etsmtl.ca/sandrews/publication/catchthrow_mig2021/)

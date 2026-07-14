@@ -1,0 +1,43 @@
+Creative content license
+=========================
+
+The creative content of this repository — the photographs in
+`src/assets/pictures/`, the poetry and prose of the zine
+(`src/assets/Zine.pdf` and `src/levels/zine.ts`), and the procedurally
+generated artwork — is:
+
+    © 2026 Yunhao Luo — licensed under
+    Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
+    International (CC BY-NC-ND 4.0).
+    https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+You may share it with attribution, for non-commercial purposes, without
+modification. All other rights are reserved.
+
+Third-party assets (NOT covered by the above)
+----------------------------------------------
+
+- `src/assets/mizuki-avatar.jpg` — artwork of Mizuki by QuAn_
+  (https://www.pixiv.net/en/users/6657532), used as an avatar with the
+  artist's permission. It remains the property of QuAn_ and is not
+  licensed for reuse.
+
+- The fluid-simulation videos in `src/assets/abyss/` were produced by
+  Yunhao Luo during research at Ubisoft La Forge and are shared here with
+  Ubisoft's permission (they contain no internal Ubisoft assets).
+  © 2026 Yunhao Luo.
+
+- `src/assets/catchThrow_MIG21.png` — teaser figure from "Catching and
+  Throwing Control of a Physically Simulated Hand" (MIG '21), of which
+  Yunhao Luo is first author; published by ACM.
+
+- The ASCII-art mascots in the zine are adapted from 東方AA纏メ処
+  (touhouaamatome.jougennotuki.com) and are credited in the zine's
+  Works Cited.
+
+- The Mizuki mod images in `src/assets/mizuki-mod/` (the Workshop
+  preview, card art, relic icons and in-game screenshots) are official
+  Arknights content © Hypergryph, with card frames / UI / gameplay
+  © Mega Crit (Slay the Spire), shown here as part of a non-commercial
+  fan mod unaffiliated with either company. They are not licensed for
+  reuse.
