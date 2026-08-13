@@ -117,6 +117,13 @@
 }
 
 :root {
+  /* Device safe-area insets keep interactive content inside the largest
+     unobstructed rectangle while full-screen backgrounds continue beneath
+     notches, rounded corners and display cutouts. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
   --ink: #d8d3c4;
   --ink-dim: #9a958a;
   --ember: #e8862a;
@@ -170,15 +177,36 @@
    show (e.g. under caret browsing); text selection stays fully available */
 * { caret-color: transparent; }
 
+html {
+  /* Safari paints display-cutout regions from the root canvas rather than
+     from fixed descendants such as the animated scene canvas. Keep a
+     scene-matched backdrop here so those regions blend with the world instead
+     of falling back to --abyss black. */
+  background-color: #35252f;
+  background-image:
+    radial-gradient(circle at 72% 18%, rgba(255, 196, 92, 0.88) 0, rgba(221, 112, 55, 0.58) 9%, transparent 24%),
+    linear-gradient(180deg, #35252f 0%, #704034 24%, #4b3035 42%, #20212b 68%, #11151d 100%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
 html, body {
   height: 100%;
-  background: var(--abyss);
   color: var(--ink);
   font-family: var(--serif);
   overflow: hidden;
 }
+body { background: transparent; }
 
-#app { position: fixed; inset: 0; }
+#app {
+  position: fixed;
+  inset: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: transparent;
+}
 #stage { position: absolute; inset: 0; }
 
 /* ---------- transition fader ---------- */
@@ -198,7 +226,7 @@ html, body {
   /* pinned high, but never under the top bar (whose height the layout
      publishes as --topbar-h; it grows as the bar's rows stack) */
   top: max(13%, calc(var(--topbar-h, 0px) + 18px));
-  left: 0; right: 0;
+  left: var(--safe-left); right: var(--safe-right);
   text-align: center;
   user-select: none;
   -webkit-user-select: none;
@@ -246,7 +274,8 @@ html, body {
 /* ---------- WebMCP chip ---------- */
 #mcp-chip {
   position: absolute;
-  right: 14px; bottom: 15px;
+  right: calc(14px + var(--safe-right));
+  bottom: calc(15px + var(--safe-bottom));
   z-index: 50;
   width: max-content;
   cursor: help;
@@ -282,10 +311,14 @@ html, body {
   flex-direction: column;
   align-items: stretch;
   gap: calc(8 * var(--ui-unit));
-  padding: 12px 18px;
+  padding:
+    calc(12px + var(--safe-top))
+    calc(18px + var(--safe-right))
+    12px
+    calc(18px + var(--safe-left));
   /* on scrolling pages the bar retreats by the scrollbar's width (published
      as --sb-w by layoutMap) so the language switch never sits under it */
-  padding-right: calc(18px + (var(--sb-w, 0px) * 0.5));
+  padding-right: calc(18px + var(--safe-right) + (var(--sb-w, 0px) * 0.5));
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
@@ -591,7 +624,8 @@ html, body {
    the single --home-footer-size knob; spacing is in em so it scales along. */
 .home-footer {
   position: absolute;
-  left: 6px; bottom: 5px;
+  left: calc(6px + var(--safe-left));
+  bottom: calc(5px + var(--safe-bottom));
   z-index: 25;
   display: flex;
   flex-direction: column;
@@ -609,7 +643,7 @@ html, body {
 /* on touch the joystick sits in the bottom-left corner; the footer moves to
    the bottom center, sitting below the joystick */
 .hud.has-touch .home-footer {
-  left: 50%;
+  left: calc(var(--safe-left) + (100% - var(--safe-left) - var(--safe-right)) / 2);
   right: auto;
   transform: translateX(-50%);
   align-items: center;
@@ -634,7 +668,9 @@ html, body {
 /* the keyboard hint is meaningless on touch; the controls speak for themselves */
 .hud.has-touch .hud-hint { display: none; }
 .joystick {
-  position: absolute; left: 26px; bottom: 34px;
+  position: absolute;
+  left: calc(26px + var(--safe-left));
+  bottom: calc(34px + var(--safe-bottom));
   width: 116px; height: 116px;
   border-radius: 50%;
   pointer-events: auto;
@@ -655,7 +691,9 @@ html, body {
   will-change: transform;
 }
 .touch-interact {
-  position: absolute; right: 30px; bottom: 44px;
+  position: absolute;
+  right: calc(30px + var(--safe-right));
+  bottom: calc(44px + var(--safe-bottom));
   width: 82px; height: 82px;
   border-radius: 50%;
   pointer-events: auto;
@@ -677,10 +715,13 @@ html, body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 3px 12px rgba(0,0,0,0.5), 0 0 28px rgba(232,134,42,0.35);
 }
 .hud-hint {
-  position: absolute; bottom: 15px; left: 50%;
+  position: absolute;
+  bottom: calc(15px + var(--safe-bottom));
+  left: calc(var(--safe-left) + (100% - var(--safe-left) - var(--safe-right)) / 2);
   transform: translateX(-50%);
   /* shrink-to-fit so the glass always hugs the hint text tightly */
-  width: max-content; max-width: calc(100vw - 28px);
+  width: max-content;
+  max-width: calc(100vw - var(--safe-left) - var(--safe-right) - 28px);
   /* keeps its whispering italic-serif voice over the glass pill base */
   font-family: var(--serif);
   font-style: italic;
@@ -767,6 +808,11 @@ html, body {
   -webkit-user-select: none;
   display: grid;
   place-items: center;
+  padding:
+    calc(16px + var(--safe-top))
+    calc(16px + var(--safe-right))
+    calc(16px + var(--safe-bottom))
+    calc(16px + var(--safe-left));
 }
 /* the dimming veil fades on its own pseudo-element: if the whole overlay
    animated opacity, the glass box would sit under an animating-opacity
@@ -883,6 +929,10 @@ html, body {
     rgba(6, 8, 13, 0.62);
   scrollbar-width: thin;
   scrollbar-color: #3a3d46 transparent;
+  /* The article scrim paints through the cutout areas; only its content box
+     is inset into the unobstructed inner rectangle. */
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
 }
 .article-body {
   max-width: 880px;
@@ -1236,7 +1286,8 @@ html, body {
    HUD; bottom-left, clear of the top bar's identity cluster */
 .back-btn {
   position: absolute;
-  bottom: 16px; left: 18px;
+  bottom: calc(16px + var(--safe-bottom));
+  left: calc(18px + var(--safe-left));
   z-index: 45;
   cursor: pointer;
   transition: border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, text-shadow 0.18s ease;
@@ -1608,7 +1659,7 @@ html, body {
   .poi-label { max-width: 48vw; white-space: normal; }
   .poi-label .pl-name { font-size: calc(11.5 * var(--text-unit)); letter-spacing: 0.08em; line-height: 1.2; }
   .hud-hint {
-    bottom:60px;
+    bottom: calc(60px + var(--safe-bottom));
     line-height: 1.35;
     text-align: center;
   }

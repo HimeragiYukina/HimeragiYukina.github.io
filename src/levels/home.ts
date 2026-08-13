@@ -307,14 +307,23 @@ export class HomeLevel implements Level {
     el.style.setProperty('--pin-shift-x', '0px');
     el.style.setProperty('--pin-shift-y', '0px');
 
+    const rootStyle = getComputedStyle(document.documentElement);
+    const safeLeft = parseFloat(rootStyle.getPropertyValue('--safe-left')) || 0;
+    const safeRight = parseFloat(rootStyle.getPropertyValue('--safe-right')) || 0;
+    const safeTop = parseFloat(rootStyle.getPropertyValue('--safe-top')) || 0;
+    const safeBottom = parseFloat(rootStyle.getPropertyValue('--safe-bottom')) || 0;
     const margin = 16;
+    const minX = safeLeft + margin;
+    const maxX = window.innerWidth - safeRight - margin;
+    const minY = safeTop + margin;
+    const maxY = window.innerHeight - safeBottom - margin;
     const rect = el.getBoundingClientRect();
     let sx = 0;
     let sy = 0;
-    if (rect.left < margin) sx = margin - rect.left;
-    else if (rect.right > window.innerWidth - margin) sx = window.innerWidth - margin - rect.right;
-    if (rect.top < margin) sy = margin - rect.top;
-    else if (rect.bottom > window.innerHeight - margin) sy = window.innerHeight - margin - rect.bottom;
+    if (rect.left < minX) sx = minX - rect.left;
+    else if (rect.right > maxX) sx = maxX - rect.right;
+    if (rect.top < minY) sy = minY - rect.top;
+    else if (rect.bottom > maxY) sy = maxY - rect.bottom;
     el.style.setProperty('--pin-shift-x', `${sx}px`);
     el.style.setProperty('--pin-shift-y', `${sy}px`);
     return { sx, sy };
@@ -342,6 +351,9 @@ export class HomeLevel implements Level {
     const disp = this.comp.display.getBoundingClientRect();
     const scale = disp.width / this.comp.vw;
 
+    const rootStyle = getComputedStyle(document.documentElement);
+    const safeBottom = parseFloat(rootStyle.getPropertyValue('--safe-bottom')) || 0;
+
     // 1) pin every landmark label above its landmark — labels are always
     //    visible, clamping to the screen edges on both axes
     for (const { poi, el } of this.labels) {
@@ -362,7 +374,7 @@ export class HomeLevel implements Level {
           const b = items[i].rect;
           if (!(a.left < b.right + 10 && a.right > b.left - 10 && a.top < b.bottom + 8 && a.bottom > b.top - 8)) continue;
           let dy = a.bottom + 8 - b.top;
-          if (b.bottom + dy > window.innerHeight - 16) dy = a.top - 8 - b.bottom;
+          if (b.bottom + dy > window.innerHeight - safeBottom - 16) dy = a.top - 8 - b.bottom;
           const el = items[i].el;
           const cur = parseFloat(el.style.getPropertyValue('--pin-shift-y')) || 0;
           el.style.setProperty('--pin-shift-y', `${cur + dy}px`);
