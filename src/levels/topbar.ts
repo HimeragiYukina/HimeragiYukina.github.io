@@ -24,6 +24,28 @@ const LINKEDIN_SVG =
 // page navigations (the bar is rebuilt on each mount)
 let nameFolded = false;
 
+const FONT_SCALE_KEY = 'site-font-scale';
+const FONT_SCALE_LEVELS = [0.8, 0.9, 1, 1.1, 1.2] as const;
+
+function readFontScaleIndex(): number {
+  try {
+    const saved = Number(localStorage.getItem(FONT_SCALE_KEY));
+    const index = FONT_SCALE_LEVELS.findIndex((level) => Math.abs(level - saved) < 0.001);
+    if (index >= 0) return index;
+  } catch { /* storage may be blocked */ }
+  return FONT_SCALE_LEVELS.indexOf(1);
+}
+
+let fontScaleIndex = readFontScaleIndex();
+
+function applyFontScale(): void {
+  const scale = FONT_SCALE_LEVELS[fontScaleIndex];
+  document.documentElement.style.setProperty('--font-scale', String(scale));
+  try { localStorage.setItem(FONT_SCALE_KEY, String(scale)); } catch { /* ignore */ }
+}
+
+applyFontScale();
+
 export function buildTopBar(router: Router, currentId: string): HTMLElement {
   const bar = document.createElement('header');
   bar.className = 'top-bar';
@@ -52,16 +74,28 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
         <a class="glass-icon" href="https://github.com/HimeragiYukina" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">${GITHUB_SVG}</a>
         <a class="glass-icon" href="https://www.linkedin.com/in/yunhao-luo-853b16234/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">${LINKEDIN_SVG}</a>
       </div>
-      <div class="lang-select" data-lang-select>
-        <button class="glass-icon lang-btn" type="button" data-lang-toggle aria-haspopup="menu" aria-expanded="false" aria-label="${langShort()} — select language / 选择语言" title="Language / 语言">${LANGUAGE_ICON}<span class="lang-code" data-lang-code lang="${htmlLangOf()}">${langShort()}</span></button>
-        <div class="lang-menu" role="menu">
-          ${
-            // each option is tagged with its own language: without it, Chinese
-            // text inside an English page skips the generic-serif mapping and
-            // lands on the browser's per-script sans fallback (and a screen
-            // reader would read 中文 with an English voice)
-            LANGS.map((l) => `<button class="lang-opt" type="button" role="menuitemradio" lang="${l.htmlLang}" data-lang="${l.id}">${l.label}</button>`).join('')
-          }
+      <div class="tb-settings">
+        <div class="lang-select" data-lang-select>
+          <button class="glass-icon lang-btn" type="button" data-lang-toggle aria-haspopup="menu" aria-expanded="false" aria-label="${langShort()} — select language / 选择语言" title="Language / 语言">${LANGUAGE_ICON}<span class="lang-code" data-lang-code lang="${htmlLangOf()}">${langShort()}</span></button>
+          <div class="lang-menu" role="menu">
+            ${
+              // each option is tagged with its own language: without it, Chinese
+              // text inside an English page skips the generic-serif mapping and
+              // lands on the browser's per-script sans fallback (and a screen
+              // reader would read 中文 with an English voice)
+              LANGS.map((l) => `<button class="lang-opt" type="button" role="menuitemradio" lang="${l.htmlLang}" data-lang="${l.id}">${l.label}</button>`).join('')
+            }
+          </div>
+        </div>
+        <div class="font-select" data-font-select>
+          <button class="glass-icon font-trigger" type="button" data-font-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Text size / 字号" title="Text size / 字号"><span aria-hidden="true">Aa</span></button>
+          <div class="font-menu" role="dialog" aria-label="Text size / 字号">
+            <span class="font-size-label" data-i18n="settings.textSize">${t('settings.textSize')}</span>
+            <div class="font-size-actions" role="group" aria-label="Text size / 字号">
+              <button class="font-size-btn font-size-small" type="button" data-font-decrease aria-label="Decrease text size / 缩小字号">A</button>
+              <button class="font-size-btn font-size-large" type="button" data-font-increase aria-label="Increase text size / 增大字号">A</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -88,7 +122,10 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
     };
     const onKey = (e: KeyboardEvent) => {
       if (!bar.isConnected) return document.removeEventListener('keydown', onKey);
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape' && container.classList.contains('open')) {
+        setOpen(false);
+        toggleBtn.focus();
+      }
     };
     document.addEventListener('pointerdown', onDoc);
     document.addEventListener('keydown', onKey);
@@ -107,6 +144,27 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
       o.setAttribute('aria-checked', String(on));
     });
   const lang = wireDropdown(select, langToggle, markActive);
+  const fontSelect = bar.querySelector<HTMLElement>('[data-font-select]')!;
+  const fontToggle = fontSelect.querySelector<HTMLElement>('[data-font-toggle]')!;
+  const fontDecrease = fontSelect.querySelector<HTMLButtonElement>('[data-font-decrease]')!;
+  const fontIncrease = fontSelect.querySelector<HTMLButtonElement>('[data-font-increase]')!;
+  const updateFontControls = () => {
+    fontDecrease.disabled = fontScaleIndex === 0;
+    fontIncrease.disabled = fontScaleIndex === FONT_SCALE_LEVELS.length - 1;
+  };
+  const setFontScale = (index: number) => {
+    fontScaleIndex = Math.max(0, Math.min(FONT_SCALE_LEVELS.length - 1, index));
+    applyFontScale();
+    updateFontControls();
+    requestAnimationFrame(layoutMap);
+  };
+  wireDropdown(fontSelect, fontToggle, () => {
+    updateFontControls();
+    requestAnimationFrame(() => fontDecrease.focus());
+  });
+  fontDecrease.addEventListener('click', () => setFontScale(fontScaleIndex - 1));
+  fontIncrease.addEventListener('click', () => setFontScale(fontScaleIndex + 1));
+  updateFontControls();
   select.querySelectorAll<HTMLElement>('.lang-opt').forEach((o) =>
     o.addEventListener('click', () => {
       setLang(o.dataset.lang as ReturnType<typeof getLang>);
@@ -132,9 +190,9 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
   /**
    * Responsive top-bar layout in four stages of narrowing. The site map is
    * always a single line (overflow collapses into the inline More menu):
-   *   1. one row:      id · map · social links · language (with code)
-   *   2. map drops:    id · social links · language   /   map
-   *   3. links drop:   id · language                  /   social links · map
+   *   1. one row:      id · map · social links · settings
+   *   2. map drops:    id · social links · settings   /   map
+   *   3. links drop:   id · settings                  /   social links · map
    *   4. language button loses its code (globe icon only)
    *   5. the identity capsule shrinks 20%
    *   6. the identity capsule auto-folds to just the avatar
@@ -144,6 +202,7 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
   const row2 = bar.querySelector<HTMLElement>('.tb-row2')!;
   const idEl = bar.querySelector<HTMLElement>('.tb-id')!;
   const linksEl = bar.querySelector<HTMLElement>('.tb-links')!;
+  const settingsEl = bar.querySelector<HTMLElement>('.tb-settings')!;
   const layoutMap = () => {
     moreDd.close();
     // suppress the fold/shrink transitions while we reset and measure, so a
@@ -178,7 +237,7 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
     // identity capsule full-size and folded only if the user folded it
     bar.classList.remove('map-stacked', 'links-stacked', 'lang-compact', 'id-shrunk');
     idEl.classList.toggle('folded', nameFolded);
-    row1.insertBefore(linksEl, select);
+    row1.insertBefore(linksEl, settingsEl);
     row1.insertBefore(map, linksEl);
     row2.hidden = true;
     restoreInline();
@@ -198,12 +257,20 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
       collapseToFit();
       bar.classList.remove('tb-measuring');
       // publish the bar's height so content can clear it (the souls banner
-      // and article bodies read --topbar-h; it grows as rows stack)
-      document.documentElement.style.setProperty('--topbar-h', `${bar.offsetHeight}px`);
+      // and article bodies read --topbar-h; it grows as rows stack). Article
+      // padding lives inside a zoomed coordinate system, so also publish the
+      // equivalent unzoomed offset using the body's current computed zoom.
+      const barHeight = bar.offsetHeight;
+      document.documentElement.style.setProperty('--topbar-h', `${barHeight}px`);
+      const articleBody = document.querySelector<HTMLElement>('.article-body');
+      if (articleBody) {
+        const articleZoom = parseFloat(getComputedStyle(articleBody).zoom) || 1;
+        document.documentElement.style.setProperty('--article-topbar-offset', `${barHeight / articleZoom}px`);
+      }
     };
 
     // stage 1: id + minimal map + links + language all fit comfortably?
-    if (w(idEl) + mapMin + w(linksEl) + w(select) + gap * 3 + COMFORT <= avail) {
+    if (w(idEl) + mapMin + w(linksEl) + w(settingsEl) + gap * 3 + COMFORT <= avail) {
       done();
       return;
     }
@@ -212,7 +279,7 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
     bar.classList.add('map-stacked');
     row2.hidden = false;
     row2.appendChild(map);
-    if (w(idEl) + w(linksEl) + w(select) + gap * 2 + COMFORT <= avail) {
+    if (w(idEl) + w(linksEl) + w(settingsEl) + gap * 2 + COMFORT <= avail) {
       done();
       return;
     }
@@ -221,13 +288,13 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
     bar.classList.add('links-stacked');
     row2.insertBefore(linksEl, map);
     // stage 4: even id + language (with code) can't fit → icon-only globe
-    if (w(idEl) + w(select) + gap + COMFORT > avail) {
+    if (w(idEl) + w(settingsEl) + gap + COMFORT > avail) {
       bar.classList.add('lang-compact');
       // stage 5: still too tight → the identity capsule shrinks 20%
-      if (w(idEl) + w(select) + gap + COMFORT > avail) {
+      if (w(idEl) + w(settingsEl) + gap + COMFORT > avail) {
         bar.classList.add('id-shrunk');
         // stage 6: even shrunk it can't fit → auto-fold to just the avatar
-        if (w(idEl) + w(select) + 0.5 * gap + 0.5 * COMFORT > avail) idEl.classList.add('folded');
+        if (w(idEl) + w(settingsEl) + 0.5 * gap + 0.5 * COMFORT > avail) idEl.classList.add('folded');
       }
     }
     done();

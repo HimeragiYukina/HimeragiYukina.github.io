@@ -82,6 +82,7 @@ type Key =
   | 'nav.home'
   | 'nav.more'
   | 'nav.menu'
+  | 'settings.textSize'
   | 'hud.hint'
   | 'travel.title'
   | 'travel.flavor'
@@ -94,6 +95,7 @@ const STRINGS: Record<Lang, Record<Key, string>> = {
     'nav.home': 'Home',
     'nav.more': 'More',
     'nav.menu': 'Menu',
+    'settings.textSize': 'Text size',
     'hud.hint': 'WASD / click to move · E to interact',
     'travel.title': 'Fast Travel',
     'travel.flavor': 'Rest a moment. Where will your curiosity take you?',
@@ -105,6 +107,7 @@ const STRINGS: Record<Lang, Record<Key, string>> = {
     'nav.home': '主页',
     'nav.more': '更多',
     'nav.menu': '菜单',
+    'settings.textSize': '字号',
     'hud.hint': 'WASD / 点击移动 · E 键交互',
     'travel.title': '快速旅行',
     'travel.flavor': '稍作休憩。好奇心将带你去往何方？',
