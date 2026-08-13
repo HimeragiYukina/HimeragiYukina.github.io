@@ -21,6 +21,9 @@ export class Compositor {
   private grade!: HTMLCanvasElement;
   private blurBuf!: HTMLCanvasElement;
   private blurBufCtx!: CanvasRenderingContext2D;
+  private cssWidth = 0;
+  private cssHeight = 0;
+  private pixelRatio = 0;
 
   /**
    * The world is framed by height: exactly VIEW_H world-px of vertical extent
@@ -41,9 +44,12 @@ export class Compositor {
   }
 
   resize(): void {
-    const w = this.display.clientWidth || window.innerWidth;
-    const h = this.display.clientHeight || window.innerHeight;
+    const w = Math.max(1, this.display.clientWidth || window.innerWidth);
+    const h = Math.max(1, this.display.clientHeight || window.innerHeight);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.cssWidth = w;
+    this.cssHeight = h;
+    this.pixelRatio = dpr;
     this.display.width = Math.floor(w * dpr);
     this.display.height = Math.floor(h * dpr);
 
@@ -65,6 +71,20 @@ export class Compositor {
     [this.scene, this.sceneCtx] = mk();
     [this.glow, this.glowCtx] = mk();
     this.buildOverlays();
+  }
+
+  /**
+   * Mobile browsers can emit resize before an orientation change has settled.
+   * Recheck the canvas against its final laid-out size immediately before a
+   * frame is rendered so a stale backing store cannot remain CSS-stretched.
+   */
+  resizeIfNeeded(): void {
+    const w = Math.max(1, this.display.clientWidth || window.innerWidth);
+    const h = Math.max(1, this.display.clientHeight || window.innerHeight);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (w !== this.cssWidth || h !== this.cssHeight || dpr !== this.pixelRatio) {
+      this.resize();
+    }
   }
 
   private buildOverlays(): void {

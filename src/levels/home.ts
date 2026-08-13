@@ -202,6 +202,8 @@ export class HomeLevel implements Level {
     const comp = this.comp!;
     const input = this.input!;
 
+    comp.resizeIfNeeded();
+
     // movement: keyboard axis + on-screen joystick, combined and clamped
     const ax = input.axis();
     let mx = ax.x + this.joy.x;

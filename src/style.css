@@ -202,9 +202,6 @@ body { background: transparent; }
 #app {
   position: fixed;
   inset: 0;
-  min-width: 100vw;
-  min-height: 100vh;
-  min-height: 100dvh;
   background: transparent;
 }
 #stage { position: absolute; inset: 0; }

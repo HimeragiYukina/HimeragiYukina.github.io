@@ -28,6 +28,7 @@ export class Backdrop {
     window.addEventListener('resize', this.onResize);
     const loop = (now: number) => {
       this.raf = requestAnimationFrame(loop);
+      this.comp.resizeIfNeeded();
       backdropWorld!.renderBackdrop(this.comp, (now - this.start) / 1000);
       this.comp.present();
     };
