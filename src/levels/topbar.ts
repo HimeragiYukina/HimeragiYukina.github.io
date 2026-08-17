@@ -20,10 +20,6 @@ const GITHUB_SVG =
 const LINKEDIN_SVG =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z"/></svg>';
 
-// whether the identity capsule's name + title are folded away; persists across
-// page navigations (the bar is rebuilt on each mount)
-let nameFolded = false;
-
 const FONT_SCALE_KEY = 'site-font-scale';
 const FONT_SCALE_LEVELS = [0.8, 0.9, 1, 1.1, 1.2] as const;
 
@@ -59,12 +55,19 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
   const mapAttrs = (a: (typeof areas)[number]) => (a.poi ? `data-poi="${a.poi}"` : `data-i18n="${a.i18n}"`);
   bar.innerHTML = `
     <div class="tb-row tb-row1">
-      <div class="tb-id${nameFolded ? ' folded' : ''}">
+      <div class="tb-id">
         <img class="hud-avatar" src="${avatarUrl}" alt="Mizuki — avatar of Yunhao Luo">
         <div class="tb-name-fold"><div class="hud-name">YUNHAO LUO<small data-i18n="title">${t('title')}</small></div></div>
       </div>
       <nav class="tb-map" aria-label="site map">
-        ${areas.map((a) => (a.id === currentId ? `<span class="tb-map-item here" ${mapAttrs(a)}>${a.label}</span>` : `<a class="tb-map-item" href="${a.href}" ${mapAttrs(a)}>${a.label}</a>`)).join('')}
+        ${areas.map((a) => {
+          // Home remains actionable while current so it can refresh the world;
+          // other current-page landmarks stay inert.
+          if (a.id === 'home') return `<a class="tb-map-item${currentId === 'home' ? ' here' : ''}" href="${a.href}" ${mapAttrs(a)}>${a.label}</a>`;
+          return a.id === currentId
+            ? `<span class="tb-map-item here" ${mapAttrs(a)}>${a.label}</span>`
+            : `<a class="tb-map-item" href="${a.href}" ${mapAttrs(a)}>${a.label}</a>`;
+        }).join('')}
         <div class="tb-more" data-more hidden>
           <button class="tb-more-btn" type="button" data-more-toggle aria-haspopup="menu" aria-expanded="false"><span data-i18n="nav.more">${t('nav.more')}</span></button>
           <div class="tb-more-menu" role="menu"></div>
@@ -85,6 +88,13 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
               // reader would read 中文 with an English voice)
               LANGS.map((l) => `<button class="lang-opt" type="button" role="menuitemradio" lang="${l.htmlLang}" data-lang="${l.id}">${l.label}</button>`).join('')
             }
+            <div class="lang-font-fold" role="group" aria-label="Text size / 字号">
+              <span class="font-size-label" data-i18n="settings.textSize">${t('settings.textSize')}</span>
+              <div class="font-size-actions">
+                <button class="font-size-btn font-size-small" type="button" role="menuitem" data-folded-font-decrease aria-label="Decrease text size / 缩小字号">A</button>
+                <button class="font-size-btn font-size-large" type="button" role="menuitem" data-folded-font-increase aria-label="Increase text size / 增大字号">A</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="font-select" data-font-select>
@@ -143,14 +153,23 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
       o.classList.toggle('active', on);
       o.setAttribute('aria-checked', String(on));
     });
-  const lang = wireDropdown(select, langToggle, markActive);
+  const lang = wireDropdown(select, langToggle, () => {
+    markActive();
+    updateFontControls();
+  });
   const fontSelect = bar.querySelector<HTMLElement>('[data-font-select]')!;
   const fontToggle = fontSelect.querySelector<HTMLElement>('[data-font-toggle]')!;
   const fontDecrease = fontSelect.querySelector<HTMLButtonElement>('[data-font-decrease]')!;
   const fontIncrease = fontSelect.querySelector<HTMLButtonElement>('[data-font-increase]')!;
+  const foldedFontDecrease = select.querySelector<HTMLButtonElement>('[data-folded-font-decrease]')!;
+  const foldedFontIncrease = select.querySelector<HTMLButtonElement>('[data-folded-font-increase]')!;
   const updateFontControls = () => {
-    fontDecrease.disabled = fontScaleIndex === 0;
-    fontIncrease.disabled = fontScaleIndex === FONT_SCALE_LEVELS.length - 1;
+    [fontDecrease, foldedFontDecrease].forEach((button) => {
+      button.disabled = fontScaleIndex === 0;
+    });
+    [fontIncrease, foldedFontIncrease].forEach((button) => {
+      button.disabled = fontScaleIndex === FONT_SCALE_LEVELS.length - 1;
+    });
   };
   const setFontScale = (index: number) => {
     fontScaleIndex = Math.max(0, Math.min(FONT_SCALE_LEVELS.length - 1, index));
@@ -158,12 +177,14 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
     updateFontControls();
     requestAnimationFrame(layoutMap);
   };
-  wireDropdown(fontSelect, fontToggle, () => {
+  const font = wireDropdown(fontSelect, fontToggle, () => {
     updateFontControls();
     requestAnimationFrame(() => fontDecrease.focus());
   });
   fontDecrease.addEventListener('click', () => setFontScale(fontScaleIndex - 1));
   fontIncrease.addEventListener('click', () => setFontScale(fontScaleIndex + 1));
+  foldedFontDecrease.addEventListener('click', () => setFontScale(fontScaleIndex - 1));
+  foldedFontIncrease.addEventListener('click', () => setFontScale(fontScaleIndex + 1));
   updateFontControls();
   select.querySelectorAll<HTMLElement>('.lang-opt').forEach((o) =>
     o.addEventListener('click', () => {
@@ -184,18 +205,28 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
   const moreMenu = more.querySelector<HTMLElement>('.tb-more-menu')!;
   const moreLabel = more.querySelector<HTMLElement>('.tb-more-btn [data-i18n]')!;
   const items = [...map.querySelectorAll<HTMLElement>('.tb-map-item')]; // fixed order
+  const homeItem = items[0];
   const moreDd = wireDropdown(more, more.querySelector<HTMLElement>('[data-more-toggle]')!);
   items.forEach((it) => it.addEventListener('click', () => moreDd.close()));
+  const activateHome = (event?: Event) => {
+    event?.preventDefault();
+    if (currentId === 'home') {
+      window.location.reload();
+    } else {
+      void router.go('home');
+    }
+  };
+  homeItem.addEventListener('click', activateHome);
 
   /**
-   * Responsive top-bar layout in four stages of narrowing. The site map is
+   * Responsive top-bar layout in six stages of narrowing. The site map is
    * always a single line (overflow collapses into the inline More menu):
    *   1. one row:      id · map · social links · settings
    *   2. map drops:    id · social links · settings   /   map
    *   3. links drop:   id · settings                  /   social links · map
    *   4. language button loses its code (globe icon only)
-   *   5. the identity capsule shrinks 20%
-   *   6. the identity capsule auto-folds to just the avatar
+   *   5. the font-size control folds away if the remaining gap is too narrow
+   *   6. the identity capsule shrinks 20%
    * Each stage triggers only when the previous row can't fit comfortably.
    */
   const row1 = bar.querySelector<HTMLElement>('.tb-row1')!;
@@ -205,9 +236,7 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
   const settingsEl = bar.querySelector<HTMLElement>('.tb-settings')!;
   const layoutMap = () => {
     moreDd.close();
-    // suppress the fold/shrink transitions while we reset and measure, so a
-    // mid-animation width never corrupts a stage decision
-    bar.classList.add('tb-measuring');
+    font.close();
     // on scrolling pages, publish the scrollbar's width so the bar's right
     // padding keeps the language switch clear of it (see .top-bar in CSS);
     // set before measuring so the staged layout sees the narrowed row
@@ -218,11 +247,18 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
       more.hidden = true;
       items.forEach((it) => map.insertBefore(it, more)); // all items inline, in order
     };
-    // collapse trailing items into More until the map fits its row share
+    // Collapse trailing items into More until the map fits its row share. If
+    // Home + More alone still do not fit, compact Home to a house glyph before
+    // falling back to a single Menu button.
     const collapseToFit = () => {
       more.hidden = false; // reveal so its width counts toward the fit
-      for (let i = items.length - 1; i >= 0 && map.scrollWidth > map.clientWidth; i--) {
+      for (let i = items.length - 1; i >= 1 && map.scrollWidth > map.clientWidth; i--) {
         moreMenu.insertBefore(items[i], moreMenu.firstChild); // keep order in the menu
+      }
+      if (map.scrollWidth > map.clientWidth) bar.classList.add('home-compact');
+      if (map.scrollWidth > map.clientWidth) {
+        bar.classList.remove('home-compact'); // retain the Home text inside Menu
+        moreMenu.insertBefore(homeItem, moreMenu.firstChild);
       }
       if (moreMenu.childElementCount === 0) more.hidden = true;
       // when every nav item has collapsed inside, the button IS the whole menu,
@@ -233,10 +269,9 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
       moreLabel.textContent = t(key);
     };
 
-    // reset to stage 1: everything back on row 1, language code visible,
-    // identity capsule full-size and folded only if the user folded it
-    bar.classList.remove('map-stacked', 'links-stacked', 'lang-compact', 'id-shrunk');
-    idEl.classList.toggle('folded', nameFolded);
+    // reset to stage 1: everything back on row 1, language code visible, and
+    // the identity capsule at full size
+    bar.classList.remove('map-stacked', 'links-stacked', 'home-compact', 'lang-compact', 'font-folded', 'id-shrunk');
     row1.insertBefore(linksEl, settingsEl);
     row1.insertBefore(map, linksEl);
     row2.hidden = true;
@@ -255,7 +290,6 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
 
     const done = () => {
       collapseToFit();
-      bar.classList.remove('tb-measuring');
       // publish the bar's height so content can clear it (the souls banner
       // and article bodies read --topbar-h; it grows as rows stack). Article
       // padding lives inside a zoomed coordinate system, so also publish the
@@ -290,27 +324,28 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
     // stage 4: even id + language (with code) can't fit → icon-only globe
     if (w(idEl) + w(settingsEl) + gap + COMFORT > avail) {
       bar.classList.add('lang-compact');
-      // stage 5: still too tight → the identity capsule shrinks 20%
-      if (w(idEl) + w(settingsEl) + gap + COMFORT > avail) {
+      const controlGap = parseFloat(getComputedStyle(settingsEl).columnGap) || gap;
+      // stage 5: preserve at least the same gap used between the utility
+      // controls; fold Aa away rather than compressing the identity capsule
+      if (avail - w(idEl) - w(settingsEl) < controlGap) {
+        bar.classList.add('font-folded');
+      }
+      // stage 6: if the identity and compact language control still cannot
+      // coexist, shrink the capsule without ever folding away its text
+      if (w(idEl) + w(settingsEl) + controlGap > avail) {
         bar.classList.add('id-shrunk');
-        // stage 6: even shrunk it can't fit → auto-fold to just the avatar
-        if (w(idEl) + w(settingsEl) + 0.5 * gap + 0.5 * COMFORT > avail) idEl.classList.add('folded');
       }
     }
     done();
   };
 
-  // the avatar folds/unfolds the name + title capsule; folding changes the
-  // capsule width, so re-run the map layout once the fold transition settles
+  // The avatar returns home, or refreshes the world when already there.
   bar.querySelector<HTMLElement>('.hud-avatar')?.addEventListener('click', () => {
-    nameFolded = !nameFolded;
-    bar.querySelector('.tb-id')?.classList.toggle('folded', nameFolded);
+    activateHome();
   });
-  bar.querySelector<HTMLElement>('.tb-name-fold')?.addEventListener('transitionend', (e) => {
-    if ((e as TransitionEvent).propertyName === 'grid-template-columns') layoutMap();
-  });
+
   // clicking the name / title goes to the About page — or, when already
-  // there, scrolls to its "About Me" section (the avatar still folds)
+  // there, scrolls to its "About Me" section
   const nameEl = bar.querySelector<HTMLElement>('.hud-name');
   if (nameEl) {
     nameEl.style.cursor = 'pointer';
