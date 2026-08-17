@@ -127,7 +127,7 @@ type PoiField = 'label' | 'sub' | 'verb';
 // keyed by POI id; the English side is the POI table itself (single source of
 // truth), so only the 中文 overrides live here
 const POI_ZH: Record<string, Record<PoiField, string>> = {
-  bonfire: { label: '快速旅行', sub: '休憩，在四个区域间传送', verb: '休憩' },
+  bonfire: { label: '快速旅行', sub: '休憩，在各个区域间传送', verb: '休憩' },
   projects: { label: '项目', sub: '非学术项目', verb: '下降' },
   research: { label: '研究', sub: '我的研究项目与论文', verb: '进入' },
   mods: { label: '模组', sub: '我为游戏制作的模组', verb: '进入' },

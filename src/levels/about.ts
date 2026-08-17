@@ -3,7 +3,6 @@ import { Router } from '../router';
 import { makeArticleLevel } from './article';
 import { describeTools } from '../webmcp';
 import { ABOUT_ME_HTML } from '../content/aboutMe';
-import zineUrl from '../assets/Zine.pdf';
 // intrinsic sizes of the wall photos (regenerated with the WebP encodes) —
 // lets each <img> declare width/height so the wall never layout-shifts
 import PHOTO_DIMS from '../content/photo-dims.json';
@@ -39,8 +38,8 @@ export function makeAboutLevel(router: Router) {
         <p>
           Video games (as a player and an indie developer), poetry, board games, and photography.
 
-          Here's <a href="${zineUrl}" target="_blank" rel="noopener">a zine I made
-          for my modern poetry class (PDF)</a>. Also, enjoy some of my photography below:
+          Here's <a href="#/zine">a zine I made for my modern poetry class</a>.
+          Also, enjoy some of my photography below:
         </p>
         <div class="photo-grid">
           ${PHOTOS.map((ph) => `

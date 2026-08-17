@@ -1,8 +1,8 @@
 # Yunhao Luo — Personal Website
 
-> The personal site of Yunhao Luo, a AI researcher working on AI agents, character animation, physics simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Dark-Souls-flavoured hub world ("Crepusculum Dream") where each landmark leads to an area of content.
+> The personal site of Yunhao Luo, an AI researcher working on AI agents, character animation, physics simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Souls-inspired hub world ("Crepusculum Dream") where each landmark leads to an area of content.
 
-Yunhao Luo is a AI researcher at Huawei's Web Technology Lab. He previously researched real-time GPU fluid simulation at Ubisoft La Forge and holds an M.Sc. in Computer Science from McGill University; his thesis work received the Best Presentation Award at MIG '21.
+Yunhao Luo is an AI researcher at Huawei's Web Technology Lab. He previously researched real-time GPU fluid simulation at Ubisoft La Forge and holds an M.Sc. in Computer Science from McGill University; his thesis work received the Best Presentation Award at MIG '21.
 
 For AI agents: this site registers WebMCP tools on `document.modelContext` (list-site-pages, get-about-me, goto-site-page, set-language, walk-hero-to-landmark, get-hero-status, get-publications, get-citation). An agent in a WebMCP-capable browser can operate the site directly — jump between pages, switch language, walk the hero, read the bio and structured publication data, and get the citation.
 

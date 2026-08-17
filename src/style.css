@@ -1102,7 +1102,7 @@ body { background: transparent; }
 
 /* ---------- the Zine: white "paper" pages on the dark scrim ----------
    The zine reads as physical print — warm paper cards, typewriter type,
-   black ink — stacked down the article column like the pages of the PDF. */
+   black ink — stacked down the article column like printed pages. */
 .zine-paper {
   background: #f2eee2;
   color: #1c1a16;
@@ -1549,7 +1549,7 @@ body { background: transparent; }
 }
 
 /* ---------- abyss video gallery (fluid page) ---------- */
-/* the SYSTEM CAPABILITY content in three explicit columns (each a ul);
+/* the SYSTEM CAPABILITIES content in three explicit columns (each a ul);
    the middle column carries Advanced shading alone */
 .cap-columns {
   display: grid;

@@ -111,7 +111,7 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
   void register({
     name: 'list-site-pages',
     description:
-      'List every page of this personal website (a souls-like home world) with what it contains and the landmark that leads to it. Use this first to orient yourself.',
+      'List every page of this personal website (a Souls-inspired home world) with what it contains and the landmark that leads to it. Use this first to orient yourself.',
     inputSchema: { type: 'object', properties: {} },
     annotations: { readOnlyHint: true },
     execute: () =>

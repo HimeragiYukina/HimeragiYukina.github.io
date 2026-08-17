@@ -27,7 +27,7 @@ export function makeFluidLevel(router: Router) {
       <h1>Fluid Simulation</h1>
       <p class="abstract">
         During my internship at Ubisoft Montreal, I developed a real-time liquid simulator
-        based on the position-based fluids method using compute shaders running on the GPU, which is part of the Anvil engine now.
+        based on position-based fluids and implemented with GPU compute shaders. It is now part of the Anvil engine.
       </p>
       <div class="rule"></div>
 
@@ -45,7 +45,7 @@ export function makeFluidLevel(router: Router) {
       </section>
 
       <section>
-        <h2>SYSTEM CAPABILITY</h2>
+        <h2>SYSTEM CAPABILITIES</h2>
         <div class="cap-columns">
           <ul>
             <li><b>Core solver</b>
@@ -85,7 +85,7 @@ export function makeFluidLevel(router: Router) {
                 <li>Surface tension</li>
               </ul>
             </li>
-            <li><b>Cross platform</b>
+            <li><b>Cross-platform</b>
               <ul>
                 <li>Built with HLSL</li>
                 <li>Runs on PCs and consoles</li>
