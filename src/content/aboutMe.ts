@@ -10,9 +10,9 @@ export const ABOUT_ME_HTML: string[] = [
    researched real-time GPU fluid simulation at Ubisoft La Forge and hold an M.Sc. in Computer
    Science from McGill University, where my thesis work on physically simulated hand control
    received the Best Presentation Award at MIG '21.`,
-  `My current research interests center on <b>AI agents</b> — web agents, GUI agents, and
-   website and UI generation — alongside a long-standing foundation in character animation,
-   physics simulation, and real-time rendering. This site presents selected work: the real-time GPU
+  `My current research centers on the <b>agentic web</b>: web agents, website generation, and
+   emerging standards for making the web agent-friendly — alongside a long-standing foundation in
+   character animation, physics-based simulation, and real-time rendering. This site presents selected work: the real-time GPU
    liquid simulator developed at Ubisoft Montreal (<a href="#/projects">Projects</a>), my
    first-author publication (<a href="#/research">Research</a>), and independent game
    development (<a href="#/mods">Mods</a>).`,

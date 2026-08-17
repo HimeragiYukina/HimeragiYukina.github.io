@@ -8,21 +8,21 @@
 import { Router } from '../router';
 import { makeArticleLevel } from './article';
 // WebP encodes of the mod art (PNG originals kept alongside, unbundled)
-import previewUrl from '../assets/mizuki-mod/preview.webp';
-import artExaltation from '../assets/mizuki-mod/Exaltation.webp';
-import artCognitiveFilter from '../assets/mizuki-mod/CognitiveFilter.webp';
-import artDream from '../assets/mizuki-mod/Dream.webp';
-import artPriceOfPeace from '../assets/mizuki-mod/PriceOfPeace.webp';
-import artFeed from '../assets/mizuki-mod/Feed.webp';
-import artCRT from '../assets/mizuki-mod/CRT.webp';
-import relicMarionette from '../assets/mizuki-mod/relic-Marionette.png';
-import relicCaerulaHeart from '../assets/mizuki-mod/relic-CaerulaHeart.png';
-import relicCaerulaArbor from '../assets/mizuki-mod/relic-CaerulaArbor.png';
+import previewUrl from '../assets/mods/mizuki/gallery/preview.webp';
+import artExaltation from '../assets/mods/mizuki/cards/Exaltation.webp';
+import artCognitiveFilter from '../assets/mods/mizuki/cards/CognitiveFilter.webp';
+import artDream from '../assets/mods/mizuki/cards/Dream.webp';
+import artPriceOfPeace from '../assets/mods/mizuki/cards/PriceOfPeace.webp';
+import artFeed from '../assets/mods/mizuki/cards/Feed.webp';
+import artCRT from '../assets/mods/mizuki/cards/CRT.webp';
+import relicMarionette from '../assets/mods/mizuki/relics/relic-Marionette.png';
+import relicCaerulaHeart from '../assets/mods/mizuki/relics/relic-CaerulaHeart.png';
+import relicCaerulaArbor from '../assets/mods/mizuki/relics/relic-CaerulaArbor.png';
 // captured in-game screenshots (from the Steam Workshop listing)
-import shotSelect from '../assets/mizuki-mod/screenshot-1.webp';
-import shotCombat from '../assets/mizuki-mod/screenshot-2.webp';
-import shotCards from '../assets/mizuki-mod/screenshot-3.webp';
-import shotCardView from '../assets/mizuki-mod/screenshot-4.webp';
+import shotSelect from '../assets/mods/mizuki/gallery/screenshot-1.webp';
+import shotCombat from '../assets/mods/mizuki/gallery/screenshot-2.webp';
+import shotCards from '../assets/mods/mizuki/gallery/screenshot-3.webp';
+import shotCardView from '../assets/mods/mizuki/gallery/screenshot-4.webp';
 
 const STEAM_URL = 'https://steamcommunity.com/sharedfiles/filedetails/?id=3764504027';
 const GITHUB_URL = 'https://github.com/HimeragiYukina/mizuki-mod-sts';

@@ -8,6 +8,7 @@ import { makeAboutLevel } from './levels/about';
 import { makeZineLevel } from './levels/zine';
 import { initWebMCP } from './webmcp';
 import { onLangChange, refreshChrome } from './i18n';
+import { initMediaLoading } from './mediaLoading';
 
 // Dev/demo affordance: ?mockmcp installs a recording model-context host so the
 // WebMCP tools can be exercised from the console (window.__mcp).
@@ -34,6 +35,8 @@ if (new URLSearchParams(location.search).has('mockmcp') && !(document as any).mo
 
 const router = new Router();
 const home = new HomeLevel(router);
+
+initMediaLoading();
 
 router.register(home);
 router.register(makeFluidLevel(router));

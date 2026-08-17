@@ -1,16 +1,32 @@
 /** Research — first-author publications, presented as an article. */
 import { Router } from '../router';
 import { makeArticleLevel } from './article';
-import teaserCatchThrow from '../assets/catchThrow_MIG21.webp';
+import teaserCatchThrow from '../assets/research/catching-and-throwing/teaser.webp';
 
-export const BIBTEX = `@proceedings{catchThrow2021,
-    author = {Luo, Yunhao and Xie, Kaixiang and Andrews, Sheldon and Kry, Paul G.},
+// Resolve the downloadable paper without importing it as a module. Vite still
+// fingerprints and copies the file for production, but the browser does not
+// request the PDF (or a development ?import wrapper) until the link is opened.
+const preprintCatchThrow = new URL(
+  '../assets/research/catching-and-throwing/preprint.pdf',
+  import.meta.url,
+).href;
+
+export const BIBTEX = `@inproceedings{10.1145/3487983.3488300,
+    author = {Luo, Yunhao and Xie, Kaixiang and Andrews, Sheldon and Kry, Paul},
     title = {Catching and Throwing Control of a Physically Simulated Hand},
-    booktitle = {Proc. of the ACM/SIGGRAPH conference on Motion, Interaction and Games},
-    series = {MIG'21},
     year = {2021},
+    isbn = {9781450391313},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3487983.3488300},
     doi = {10.1145/3487983.3488300},
-    publisher = {ACM}
+    abstract = {We design a nominal controller for animating an articulated physics-based human arm model, including the hands and fingers, to catch and throw objects. The controller is based on a finite state machine that defines the target poses for proportional-derivative control of the hand, as well as the orientation and position of the center of the palm using the solution of an inverse kinematics solver. We then use reinforcement learning to train agents to improve the robustness of the nominal controller for achieving many different goals. Imitation learning based on trajectories output by a numerical optimization is used to accelerate the training process. The success of our controllers is demonstrated by a variety of throwing and catching tasks, including flipping objects, hitting targets, and throwing objects to a desired height, and for several different objects, such as cans, spheres, and rods. We also discuss ways to extend our approach so that more challenging tasks, such as juggling, may be accomplished.},
+    booktitle = {Proceedings of the 14th ACM SIGGRAPH Conference on Motion, Interaction and Games},
+    articleno = {15},
+    numpages = {7},
+    keywords = {throwing, physics-based animation, hand simulation, grasping, catching},
+    location = {Virtual Event, Switzerland},
+    series = {MIG '21}
 }`;
 
 export interface Publication {
@@ -32,10 +48,10 @@ export const PUBLICATIONS: Publication[] = [
   {
     title: 'Catching and Throwing Control of a Physically Simulated Hand',
     authors: ['Yunhao Luo', 'Kaixiang Xie', 'Sheldon Andrews', 'Paul G. Kry'],
-    venue: "ACM/SIGGRAPH Conference on Motion, Interaction and Games (MIG '21)",
+    venue: 'Proceedings of the 14th ACM SIGGRAPH Conference on Motion, Interaction and Games',
     year: 2021,
     doi: '10.1145/3487983.3488300',
-    pdf: 'http://profs.etsmtl.ca/sandrews/pdf/catchThrow_MIG21_preprint.pdf',
+    pdf: preprintCatchThrow,
     video: 'https://drive.google.com/file/d/1o-CJK0HzPpar9M6bjOkYZdYaqjIbYGoz/view?usp=sharing',
     award: "Best Presentation Award — MIG '21",
     awardUrl: 'https://mig2021.inria.fr/awards/',
@@ -56,7 +72,7 @@ export function makePapersLevel(router: Router) {
 
       <div class="item-card">
         <div class="ic-title">${p.title}</div>
-        <p><em>${p.authors.join(' · ')}</em></p>
+        <p><em>${p.authors.join(', ')}</em></p>
         <div class="ic-type">${p.venue}, ${p.year}</div>
         ${p.award ? (p.awardUrl
           ? `<a class="badge" href="${p.awardUrl}" target="_blank" rel="noopener">🏆 ${p.award}</a>`
@@ -83,9 +99,9 @@ export function makePapersLevel(router: Router) {
       </section>
 
       <section>
-        <h2>LINEAGE</h2>
+        <h2>COLLABORATION</h2>
         <ul>
-          <li>Work carried out with Kaixiang Xie, Sheldon Andrews (ÉTS Montréal) and Paul G. Kry (McGill University).</li>
+          <li>This work was conducted with Kaixiang Xie, Sheldon Andrews (ÉTS Montréal), and Paul G. Kry (McGill University).</li>
         </ul>
       </section>
     `;

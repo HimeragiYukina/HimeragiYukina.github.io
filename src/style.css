@@ -199,6 +199,21 @@ html, body {
 }
 body { background: transparent; }
 
+/* Every image and video uses the same reserved-area loading treatment. The
+   class is added only once the browser can paint the media; clearing the
+   background afterward is important for transparent avatars and relic art. */
+:where(img, video) {
+  background-color: #ffffffc4;
+  background-image: var(--media-loading);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: min(120px, 90%) auto;
+}
+:where(img, video).media-loaded {
+  background-color: transparent;
+  background-image: none;
+}
+
 #app {
   position: fixed;
   inset: 0;
@@ -1078,7 +1093,6 @@ body { background: transparent; }
   max-width: 100%;
   height: auto; /* original aspect ratio — no crop */
   border-radius: 8px;
-  background: #ffffffc4 var(--media-loading) center no-repeat;
 }
 /* landscape shots: as tall as the portraits are wide, natural width */
 .photo-card.landscape img {
@@ -1185,10 +1199,14 @@ body { background: transparent; }
   height: auto;
   margin-top: 12px;
   border-radius: 10px;
-  background: #fff;
+  /* Use only the color longhand so the shared loading image is not erased. */
+  background-color: #fff;
   padding: 6px 10px;
   border: 1px solid rgba(255,255,255,0.25);
   box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+.article .item-card .ic-teaser:not(.media-loaded) {
+  background-color: #ffffffc4;
 }
 .article .stat-row {
   display: flex; flex-wrap: wrap; gap: 10px;
@@ -1584,7 +1602,6 @@ body { background: transparent; }
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9; /* reserve the box so the placeholder shows pre-load */
-  background: #ffffffc4 var(--media-loading) center no-repeat;
   border-radius: 8px;
 }
 .video-card figcaption {

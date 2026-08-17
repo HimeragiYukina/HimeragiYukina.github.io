@@ -70,7 +70,7 @@ export function describeTools(): { name: string; summary: string; readOnly: bool
     { name: 'walk-hero-to-landmark', summary: 'walks the pixel hero to a landmark, optionally interacting (only while exploring the home world)', readOnly: false },
     { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby (only while exploring the home world)', readOnly: true },
     { name: 'get-publications', summary: 'returns first-author publications as structured JSON (only on the research page)', readOnly: true },
-    { name: 'get-citation', summary: 'returns the BibTeX citation for the publication, also copying it to the clipboard (only on the research page)', readOnly: false },
+    { name: 'get-citation', summary: 'returns the BibTeX citation and attempts to copy it to the clipboard (only on the research page)', readOnly: false },
   ];
 }
 
@@ -263,7 +263,7 @@ function syncContextTools(area: string): void {
       {
         name: 'get-citation',
         description:
-          "Return the publication's BibTeX citation, also copying it to the clipboard (mirrors the Copy button on the research page).",
+          "Return the publication's BibTeX citation and attempt to copy it to the clipboard (mirrors the Copy button on the research page).",
         inputSchema: { type: 'object', properties: {} },
         execute: async () => {
           let copied = false;

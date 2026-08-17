@@ -1,16 +1,16 @@
 /**
  * Projects — real-time GPU fluid simulation built during an internship at
  * Ubisoft Montreal (now part of the Anvil engine), presented as an article
- * with the captured test-scene videos from src/assets/abyss.
+ * with the captured test-scene videos from src/assets/fluid-simulation.
  */
 import { Router } from '../router';
 import { makeArticleLevel } from './article';
-import damUrl from '../assets/abyss/Breaking_Dam_10k.mp4';
-import damObstacleUrl from '../assets/abyss/Breaking_Dam_with_Obstacle.mp4';
-import waterfallUrl from '../assets/abyss/Waterfall.mp4';
-import fountainUrl from '../assets/abyss/Fountain.mp4';
-import planetUrl from '../assets/abyss/Liquid_Planet.mp4';
-import gravityUrl from '../assets/abyss/Extreme_Gravity.mp4';
+import damUrl from '../assets/fluid-simulation/Breaking_Dam_10k.mp4';
+import damObstacleUrl from '../assets/fluid-simulation/Breaking_Dam_with_Obstacle.mp4';
+import waterfallUrl from '../assets/fluid-simulation/Waterfall.mp4';
+import fountainUrl from '../assets/fluid-simulation/Fountain.mp4';
+import planetUrl from '../assets/fluid-simulation/Liquid_Planet.mp4';
+import gravityUrl from '../assets/fluid-simulation/Extreme_Gravity.mp4';
 
 const SCENES = [
   { src: damUrl, title: 'Breaking Dam', desc: 'a 10k-particle column collapses and races across the tank' },

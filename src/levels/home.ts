@@ -491,7 +491,7 @@ export class HomeLevel implements Level {
 
   /** Walk to a landmark and optionally interact; returns a status string. */
   async mcpWalkTo(poiId: string, interact: boolean): Promise<string> {
-    if (this.router.current?.id !== 'home') return 'The hero is not in the home world right now. Use travel-to-area with area "home" first.';
+    if (this.router.current?.id !== 'home') return 'The hero is not in the home world right now. Use goto-site-page({ page: "home" }) first.';
     const p = POIS.find((q) => q.id === poiId);
     if (!p) return `Unknown landmark "${poiId}".`;
     const ok = await this.world!.walkToPOI(p.id);
@@ -500,7 +500,7 @@ export class HomeLevel implements Level {
       this.trigger(p);
       return p.action === 'menu'
         ? `The hero rests at the ${p.label}. The travel menu is now open, listing all areas.`
-        : `The hero reached the ${p.label} and travelled to the "${p.action}" area.`;
+        : `The hero reached the ${p.label} and traveled to the "${p.action}" area.`;
     }
     return `The hero now stands before the ${p.label} (${p.sub}).`;
   }

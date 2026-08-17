@@ -7,13 +7,13 @@ import { ABOUT_ME_HTML } from '../content/aboutMe';
 // lets each <img> declare width/height so the wall never layout-shifts
 import PHOTO_DIMS from '../content/photo-dims.json';
 
-/** Photography — the wall composes every photo in src/assets/pictures
+/** Photography — the wall composes every photo in src/assets/photography/display
  *  (any extension, any case); the filename becomes the caption. Drop a
  *  file into the folder and it joins the wall on the next build (the
- *  full-resolution originals live in src/assets/pictures-full, outside
+ *  full-resolution originals live in src/assets/photography/originals, outside
  *  the bundle). */
 const PHOTOS: { src: string; caption: string; w?: number; h?: number }[] = Object.entries(
-  import.meta.glob<string>('../assets/pictures/*', { eager: true, import: 'default', query: '?url' }),
+  import.meta.glob<string>('../assets/photography/display/*', { eager: true, import: 'default', query: '?url' }),
 ).map(([path, src]) => {
   const caption = path.split('/').pop()!.replace(/\.[^.]+$/, '');
   const dims = (PHOTO_DIMS as Record<string, { w: number; h: number }>)[caption];

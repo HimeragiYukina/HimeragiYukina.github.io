@@ -1,6 +1,6 @@
 # Yunhao Luo — Personal Website
 
-> The personal site of Yunhao Luo, an AI researcher working on AI agents, character animation, physics simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Souls-inspired hub world ("Crepusculum Dream") where each landmark leads to an area of content.
+> The personal site of Yunhao Luo, an AI researcher focused on the agentic web — web agents, website generation, and emerging standards for making the web agent-friendly — with a foundation in character animation, physics-based simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Souls-inspired hub world ("Crepusculum Dream") where each landmark leads to an area of content.
 
 Yunhao Luo is an AI researcher at Huawei's Web Technology Lab. He previously researched real-time GPU fluid simulation at Ubisoft La Forge and holds an M.Sc. in Computer Science from McGill University; his thesis work received the Best Presentation Award at MIG '21.
 
