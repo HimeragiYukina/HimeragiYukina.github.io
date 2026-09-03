@@ -1,12 +1,25 @@
 # Yunhao Luo — Personal Website
 
-> The personal site of Yunhao Luo, an AI researcher focused on the agentic web — web agents, website generation, and emerging standards for making the web agent-friendly — with a foundation in character animation, physics-based simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Souls-inspired hub world ("Crepusculum Dream") where each landmark leads to an area of content.
+> The personal site of Yunhao Luo, an AI researcher focused on the agentic web — web agents, website generation, and emerging standards for making the web agent-friendly — with a foundation in character animation, physics-based simulation, and real-time rendering. The site is shaped like a game: an HD-2D, Souls-inspired hub world ("Crepusculum Dream") where visitors explore with keyboard, mouse, or touch controls and each landmark leads to an area of content.
 
 Yunhao Luo is an AI researcher at Huawei Canada's Web Technology Lab. He previously researched real-time GPU fluid simulation at Ubisoft La Forge and holds an M.Sc. in Computer Science from McGill University; his thesis work received the Best Presentation Award at MIG '21.
 
-For AI agents: this site registers WebMCP tools on `document.modelContext`. Five global tools stay available everywhere: `list-site-pages`, `get-about-me`, `goto-site-page`, `set-language`, and `create-portfolio-tour`. The tour tool creates a visible goal-specific route the visitor and agent can follow in the same UI. The remaining tools follow the active page and are removed when the visitor leaves it. On every content page, `get-page-overview` and `focus-page-section` are re-registered with that page's own description, section enum, returned data, and visible effect.
+## WebMCP interface
 
-Page tools: Home provides `walk-hero-to-landmark` and `get-hero-status`; Projects provides `get-fluid-simulation`; Research provides the read-only `get-publications` and `get-citation` plus the separate `copy-citation` action; Mods provides `get-mod-details` and `goto_workshop_page`; The Zine provides `read-zine-piece`; About provides `get-photography-captions`.
+This site registers WebMCP tools on `document.modelContext`. They operate the same live router and DOM used by the visitor, not a detached content API. Navigation updates the visible area, URL fragment, page metadata, and registered tools together.
+
+`create-portfolio-tour` is the central human-agent collaboration tool. It maps a recruiting, research, technical, creative, or complete-portfolio goal to a visible route panel. The visitor and agent see the same stops; selecting one navigates the real site and focuses the relevant introduction or section.
+
+Tool scopes:
+
+- Global: `list-site-pages`, `get-about-me`, `goto-site-page`, `set-language`, `create-portfolio-tour`
+- Home: `walk-hero-to-landmark`, `get-hero-status`
+- Every content page: `get-page-overview`, `focus-page-section`, re-registered with that page's description, section enum, returned data, and visible effect
+- Projects: `get-fluid-simulation`
+- Research: `get-publications`, `get-citation`, `copy-citation`
+- Mods: `get-mod-details`, `goto_workshop_page`
+- The Zine: `read-zine-piece`
+- About: `get-photography-captions`
 
 ## Areas
 

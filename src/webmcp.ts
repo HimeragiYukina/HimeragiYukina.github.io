@@ -224,26 +224,35 @@ let articleAbort: AbortController | null = null;
 let articleArea: ArticleArea | null = null;
 let registeredNames: string[] = [];
 
+export type ToolDocScope = 'global' | 'home' | 'content' | ArticleArea;
+
+export interface ToolDoc {
+  name: string;
+  summary: string;
+  readOnly: boolean;
+  scope: ToolDocScope;
+}
+
 /** Static tool metadata for the About page (kept in sync with registration below). */
-export function describeTools(): { name: string; summary: string; readOnly: boolean }[] {
+export function describeTools(): ToolDoc[] {
   return [
-    { name: 'list-site-pages', summary: 'lists every page of the site and how to reach it', readOnly: true },
-    { name: 'get-about-me', summary: "returns the author's short biography", readOnly: true },
-    { name: 'goto-site-page', summary: `jumps to a page (${AREAS.join(', ')}) — like resting at the bonfire`, readOnly: false },
-    { name: 'set-language', summary: `switches the UI language (${LANGS.map((l) => l.id).join(', ')})`, readOnly: false },
-    { name: 'create-portfolio-tour', summary: 'creates a visible, goal-specific route that the visitor and agent can follow together', readOnly: false },
-    { name: 'walk-hero-to-landmark', summary: 'walks the pixel hero to a landmark and optionally interacts with it', readOnly: false },
-    { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby', readOnly: true },
-    { name: 'get-page-overview', summary: 'returns the active content as structured JSON', readOnly: true },
-    { name: 'focus-page-section', summary: 'scrolls to and highlights a section', readOnly: false },
-    { name: 'get-fluid-simulation', summary: 'returns test scenes and technical capabilities for the fluid simulator', readOnly: true },
-    { name: 'get-publications', summary: 'returns first-author publications as structured JSON', readOnly: true },
-    { name: 'get-citation', summary: 'returns the complete BibTeX citation without copying it', readOnly: true },
-    { name: 'copy-citation', summary: 'copies the complete BibTeX citation to the clipboard', readOnly: false },
-    { name: 'get-mod-details', summary: 'returns mod statistics, mechanics, and featured cards', readOnly: true },
-    { name: 'goto_workshop_page', summary: 'opens the Mizuki Mod Steam Workshop listing', readOnly: false },
-    { name: 'read-zine-piece', summary: 'returns one poem or editorial section by id', readOnly: true },
-    { name: 'get-photography-captions', summary: 'lists the titles of Yunhao Luo’s portfolio photographs', readOnly: true },
+    { name: 'list-site-pages', summary: 'lists every page of the site and how to reach it', readOnly: true, scope: 'global' },
+    { name: 'get-about-me', summary: "returns the author's short biography", readOnly: true, scope: 'global' },
+    { name: 'goto-site-page', summary: `jumps to a page (${AREAS.join(', ')}) — like resting at the bonfire`, readOnly: false, scope: 'global' },
+    { name: 'set-language', summary: `switches the UI language (${LANGS.map((l) => l.id).join(', ')})`, readOnly: false, scope: 'global' },
+    { name: 'create-portfolio-tour', summary: 'creates a visible, goal-specific route that the visitor and agent can follow together', readOnly: false, scope: 'global' },
+    { name: 'walk-hero-to-landmark', summary: 'walks the pixel hero to a landmark and optionally interacts with it', readOnly: false, scope: 'home' },
+    { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby', readOnly: true, scope: 'home' },
+    { name: 'get-page-overview', summary: 'returns the active content as structured JSON', readOnly: true, scope: 'content' },
+    { name: 'focus-page-section', summary: 'scrolls to and highlights a section', readOnly: false, scope: 'content' },
+    { name: 'get-fluid-simulation', summary: 'returns test scenes and technical capabilities for the fluid simulator', readOnly: true, scope: 'projects' },
+    { name: 'get-publications', summary: 'returns first-author publications as structured JSON', readOnly: true, scope: 'research' },
+    { name: 'get-citation', summary: 'returns the complete BibTeX citation without copying it', readOnly: true, scope: 'research' },
+    { name: 'copy-citation', summary: 'copies the complete BibTeX citation to the clipboard', readOnly: false, scope: 'research' },
+    { name: 'get-mod-details', summary: 'returns mod statistics, mechanics, and featured cards', readOnly: true, scope: 'mods' },
+    { name: 'goto_workshop_page', summary: 'opens the Mizuki Mod Steam Workshop listing', readOnly: false, scope: 'mods' },
+    { name: 'read-zine-piece', summary: 'returns one poem or editorial section by id', readOnly: true, scope: 'zine' },
+    { name: 'get-photography-captions', summary: 'lists the titles of Yunhao Luo’s portfolio photographs', readOnly: true, scope: 'about' },
   ];
 }
 

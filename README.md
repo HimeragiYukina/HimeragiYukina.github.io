@@ -1,6 +1,6 @@
 # Yunhao Luo's Personal Website
 
-An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub world. Each landmark provides access to a distinct section of the site.
+A playable personal portfolio presented as an HD-2D, Souls-inspired JRPG hub world. Visitors can explore it using keyboard, mouse, or touch controls, while a WebMCP-capable agent can collaborate through the same page UI. Each landmark provides access to a distinct section of the site.
 
 ## Site Areas
 
@@ -20,7 +20,9 @@ An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub w
 - **Procedural artwork:** Sprites, tiles, the moon, and the distant castle are generated at startup by deterministic procedural rendering functions in [src/engine/sprites.ts](src/engine/sprites.ts). Photographs, mod artwork, and the publication preview are distributed as display-resolution WebP assets; full-resolution source files are excluded from the application bundle.
 - **Internationalization:** The interface supports English and Simplified Chinese through [src/i18n.ts](src/i18n.ts). The language selector updates interface text without reloading the page. Chinese text uses the reader's system serif font when available, with a 17 KB subset of Noto Serif SC as a glyph fallback. The subset is restricted by `unicode-range` and loaded only when required. After modifying Chinese interface strings, regenerate the subset with `npm run subset-cjk`.
 - **WebMCP integration:** [src/webmcp.ts](src/webmcp.ts) registers tools on `document.modelContext` when a compatible model-context host is available. The surface follows the active page: global tools stay available; page tools register only where their actions and data make sense; and `AbortController` removes them on departure. The same `get-page-overview` and `focus-page-section` names are re-registered with page-specific descriptions, input enums, results, and visible effects. Definitions include human-readable titles, strict schemas, read-only and trust annotations, cancellation-aware execution, and descriptions/results kept within Chrome's recommended character budgets.
-- **Agent-readable metadata:** [public/llms.txt](public/llms.txt) describes the site areas and WebMCP tools for AI agents. It is served at `/llms.txt` alongside `/robots.txt`. Fonts use self-hosted WOFF2 subsets, and all pages are optimized for high Lighthouse scores across the available audit categories.
+- **Collaborative portfolio tour:** `create-portfolio-tour` converts a recruiting, research, technical, creative, or complete-portfolio goal into a visible route panel. Agent and visitor see the same stops; selecting one uses the real router and focuses the relevant introduction or section in the shared page.
+- **Shared page state:** WebMCP tools act on the mounted application rather than a detached content API. Agent and visitor navigation uses the same router and DOM, so the visible area, URL fragment, route-specific metadata, focused section, and registered tool surface remain synchronized.
+- **Page and agent metadata:** [src/metadata.ts](src/metadata.ts) gives every mounted area its own browser title, description, Open Graph data, and link-preview data. The static homepage metadata and JSON-LD identify the site as a playable WebMCP portfolio, while [public/llms.txt](public/llms.txt) documents its areas and tools for agents. Because the application uses hash routes, the root URL remains the single canonical and sitemap entry. GitHub and LinkedIn are the only public profile links.
 
 ## WebMCP Tools by Page
 
@@ -46,12 +48,14 @@ This site predates the OpenAI WebMCP Challenge. The latest pre-challenge baselin
 | Citation reading and clipboard writing shared one tool | Separate `get-citation` and `copy-citation` responsibilities with paste-ready BibTeX |
 | Basic schemas and lifecycle cleanup | Titles, strict schemas, trust/read annotations, execution cancellation, route cancellation, and Chrome character budgets |
 | Build optimized for Chrome 150 | Build and test coverage extended to the challenge minimum, Chrome 149 |
+| Generic researcher metadata on every hash route | Playable WebMCP positioning plus route-specific title, description, Open Graph, and link-preview metadata |
 
 ### Suggested WebMCP tests
 
 1. From any page, ask the agent to call `create-portfolio-tour` for a recruiter, research collaborator, technical reviewer, creative explorer, or complete tour. A visible route appears in the same page; select a stop to navigate and focus the relevant section.
 2. Move between Projects, Research, Mods, The Zine, and About, and inspect the registered tools. `get-page-overview` and `focus-page-section` retain their names while their descriptions and schemas change; exclusive tools appear only where they can succeed.
 3. On Research, compare `get-citation` with `copy-citation`: the former leaves the UI and clipboard unchanged, while the latter copies a complete BibTeX entry suitable for Overleaf.
+4. Navigate with either the UI or `goto-site-page`, then inspect the browser title and description. The page, URL fragment, metadata, and page-scoped tools should all describe the same active area.
 
 ## Local Development
 

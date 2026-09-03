@@ -19,7 +19,7 @@ All commits after `5acdbc7` are timestamped challenge-period work. Inspect them 
 
 ```sh
 git log --reverse 5acdbc7..main
-git diff 5acdbc7..main -- src/webmcp.ts src/levels/about.ts src/style.css public/llms.txt README.md CHALLENGE.md
+git diff 5acdbc7..main -- index.html src/metadata.ts src/router.ts src/webmcp.ts src/levels/about.ts src/style.css public/llms.txt README.md CHALLENGE.md
 ```
 
 The extension turns the earlier tool collection into a fuller page-aware interface:
@@ -29,9 +29,10 @@ The extension turns the earlier tool collection into a fuller page-aware interfa
 - **A Mods action.** `goto_workshop_page` exists only on Mods and navigates to the public Steam Workshop listing.
 - **Human-agent collaboration.** `focus-page-section` scrolls and briefly highlights the requested section so the agent can guide a human through the visual site instead of only returning text off-screen.
 - **A shared portfolio tour.** The global `create-portfolio-tour` tool turns a visitor goal into a visible route panel. Its human-operated stops use the site's real router and section focus behavior, so the visitor and agent remain in the same page state.
+- **One shared application state.** Agent actions use the site's live router and DOM rather than a detached content API. Navigation keeps the visible page, URL fragment, page metadata, focused content, and registered tool surface synchronized for the visitor and agent.
 - **Safer lifecycle handling.** Every content-page tool shares a route-owned `AbortController`, and late asynchronous registrations are ignored after their route signal is aborted. This prevents stale tools from leaking across rapid navigation.
 - **Secure-tool hardening.** Each definition now has a human-readable title, a strict JSON schema, explicit read/trust annotations, and an execution cancellation signal. Parameter descriptions and individual results are kept within Chrome's recommended character budgets.
-- **Discoverability.** The About page, README, and `/llms.txt` explain the context-dependent tool surface to people and agents.
+- **Discoverability.** Homepage metadata describes the portfolio as playable by keyboard, mouse, touch controls, or WebMCP. Each mounted area updates its browser, Open Graph, and link-preview metadata, while the About page, README, and `/llms.txt` explain the context-dependent tool surface. The public identity exposes only GitHub and LinkedIn profiles.
 
 ## Verification
 
@@ -40,4 +41,4 @@ The challenge extension is checked in two WebMCP-capable clients:
 - ChatGPT's in-app browser; and
 - Google Chrome 151 with WebMCP testing enabled.
 
-Route tests verify both sides of the lifecycle: a page's exclusive tools appear after navigation, and disappear after leaving. `npm run build` type-checks the complete registration layer before producing the deployable site.
+Route tests verify both sides of the lifecycle: a page's exclusive tools appear after navigation and disappear after leaving. Browser checks also verify that route-specific metadata follows the active page. `npm run build` type-checks the complete registration layer before producing the deployable site.
