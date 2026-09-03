@@ -552,7 +552,9 @@ function focusPageSection(area: ArticleArea, sectionId: string): string {
 
   const target = (heading.closest('section, .zine-paper') ?? heading) as HTMLElement;
   document.querySelectorAll('.webmcp-focus').forEach((el) => el.classList.remove('webmcp-focus'));
-  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Centering keeps the focused content clear of the liquid-glass top bar,
+  // whose responsive height overlays the top of every article page.
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   target.classList.add('webmcp-focus');
   window.setTimeout(() => target.classList.remove('webmcp-focus'), 1800);
   return `Focused "${section.heading}" on ${config.label}.`;
