@@ -294,7 +294,8 @@ function createPortfolioTour(goal: TourGoal, router: Router): string {
     button.addEventListener('click', async () => {
       status.textContent = `Opening ${step.label}…`;
       const currentPage = router.current?.id ?? 'home';
-      if (currentPage !== step.page) {
+      const arrivingOnNewPage = currentPage !== step.page;
+      if (arrivingOnNewPage) {
         const moved = await router.go(step.page);
         if (!moved && router.current?.id !== step.page) {
           status.textContent = 'The page is already transitioning. Try this stop again in a moment.';
@@ -303,8 +304,14 @@ function createPortfolioTour(goal: TourGoal, router: Router): string {
       }
       buttons.forEach((candidate) => candidate.classList.remove('is-current'));
       button.classList.add('is-current');
-      if (step.section && step.page !== 'home') focusPageSection(step.page, step.section);
-      status.textContent = `Now sharing ${step.label}. The visitor and agent are on the same page state.`;
+      if (step.page !== 'home') {
+        // Give a newly arrived visitor the page's own introduction before
+        // jumping deeper. Selecting the stop again focuses its exact section.
+        focusPageSection(step.page, arrivingOnNewPage ? 'overview' : (step.section ?? 'overview'));
+      }
+      status.textContent = arrivingOnNewPage && step.page !== 'home'
+        ? `Arrived at ${step.label} with the page introduction in view. Select this stop again to focus its section.`
+        : `Now sharing ${step.label}. The visitor and agent are on the same page state.`;
     });
     buttons.push(button);
     item.appendChild(button);
@@ -550,7 +557,12 @@ function focusPageSection(area: ArticleArea, sectionId: string): string {
   const heading = articleHeading(area, section.heading);
   if (!heading) return `The "${section.heading}" section is not available right now.`;
 
-  const target = (heading.closest('section, .zine-paper') ?? heading) as HTMLElement;
+  // Every article opens with an abstract immediately after its H1. Treat that
+  // paragraph as the overview focus target so a new page starts with context.
+  const intro = sectionId === 'overview'
+    ? articleRoot(area)?.querySelector<HTMLElement>('.abstract')
+    : null;
+  const target = (intro ?? heading.closest('section, .zine-paper') ?? heading) as HTMLElement;
   document.querySelectorAll('.webmcp-focus').forEach((el) => el.classList.remove('webmcp-focus'));
   // Centering keeps the focused content clear of the liquid-glass top bar,
   // whose responsive height overlays the top of every article page.
