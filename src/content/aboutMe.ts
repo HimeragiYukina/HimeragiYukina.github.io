@@ -25,8 +25,8 @@ export const ABOUT_ME_TEXT: string = ABOUT_ME_HTML.map((p) =>
 
 /**
  * Center the "About Me" section (#about-me) on screen and flash a brief
- * golden highlight over it. Shared by the top-bar name click and the
- * get-about-me WebMCP tool; returns true if the section was present.
+ * golden highlight over it. Used by the top-bar name click; WebMCP keeps the
+ * read-only get-about-me operation separate from focus-page-section.
  */
 export function revealAboutMe(): boolean {
   const el = document.getElementById('about-me');

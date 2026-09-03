@@ -17,28 +17,36 @@
  *      · every article page: get-page-overview, focus-page-section (the same
  *        names are re-registered with page-specific descriptions and schemas)
  *      · projects only: get-fluid-simulation
- *      · research only: get-publications, get-citation
+ *      · research only: get-publications, get-citation, copy-citation
  *      · mods only: get-mod-details, goto_workshop_page
  *      · zine only: read-zine-piece
  *      · about only: get-photography-captions
  */
 import type { Router } from './router';
 import type { HomeLevel } from './levels/home';
-import { PUBLICATIONS, BIBTEX } from './levels/papers';
+import { BIBTEX } from './levels/papers';
 import { STEAM_URL } from './levels/mod';
 import { POIS } from './engine/world';
-import { ABOUT_ME_TEXT, revealAboutMe } from './content/aboutMe';
+import { ABOUT_ME_TEXT } from './content/aboutMe';
 import { LANGS, getLang, setLang, type Lang } from './i18n';
 
+interface ToolExecuteOptions {
+  signal: AbortSignal;
+}
+interface ToolAnnotations {
+  readOnlyHint?: boolean;
+  untrustedContentHint?: boolean;
+}
 interface ToolDefinition {
   name: string;
+  title: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  execute: (params: any) => Promise<string | null> | string | null;
-  annotations?: { readOnlyHint?: boolean };
+  execute: (params: any, options: ToolExecuteOptions) => Promise<string | null> | string | null;
+  annotations?: ToolAnnotations;
 }
 interface ModelContext {
-  registerTool(tool: ToolDefinition, options?: { signal?: AbortSignal }): void | Promise<void>;
+  registerTool(tool: ToolDefinition, options?: { signal?: AbortSignal; exposedTo?: string[] }): void | Promise<void>;
 }
 
 function getModelContext(): ModelContext | null {
@@ -133,6 +141,7 @@ const PAGE_SCOPED_NAMES = new Set([
   'get-fluid-simulation',
   'get-publications',
   'get-citation',
+  'copy-citation',
   'get-mod-details',
   'goto_workshop_page',
   'read-zine-piece',
@@ -159,7 +168,8 @@ export function describeTools(): { name: string; summary: string; readOnly: bool
     { name: 'focus-page-section', summary: 'scrolls to and highlights a section; its allowed sections change with the page', readOnly: false },
     { name: 'get-fluid-simulation', summary: 'returns the project’s test scenes and technical capabilities (only on Projects)', readOnly: true },
     { name: 'get-publications', summary: 'returns first-author publications as structured JSON (only on the research page)', readOnly: true },
-    { name: 'get-citation', summary: 'returns the BibTeX citation and attempts to copy it to the clipboard (only on the research page)', readOnly: false },
+    { name: 'get-citation', summary: 'returns the BibTeX citation shown on Research (only on the research page)', readOnly: true },
+    { name: 'copy-citation', summary: 'copies the visible BibTeX citation to the clipboard (only on the research page)', readOnly: false },
     { name: 'get-mod-details', summary: 'returns mod statistics, mechanics, and featured cards (only on Mods)', readOnly: true },
     { name: 'goto_workshop_page', summary: 'opens the Mizuki Mod Steam Workshop listing (only on the Mods page)', readOnly: false },
     { name: 'read-zine-piece', summary: 'returns one poem or section by id (only in The Zine)', readOnly: true },
@@ -184,10 +194,23 @@ function updateChip(): void {
   }
 }
 
+function throwIfCancelled(signal?: AbortSignal): void {
+  if (signal?.aborted) {
+    throw signal.reason ?? new DOMException('The tool execution was cancelled.', 'AbortError');
+  }
+}
+
 async function register(tool: ToolDefinition, signal?: AbortSignal): Promise<void> {
   if (!mc) return;
   try {
-    await mc.registerTool(tool, signal ? { signal } : undefined);
+    const guardedTool: ToolDefinition = {
+      ...tool,
+      execute: (params, options) => {
+        throwIfCancelled(options?.signal);
+        return tool.execute(params, options);
+      },
+    };
+    await mc.registerTool(guardedTool, signal ? { signal } : undefined);
     // A route can change while an asynchronous host is still registering the
     // previous page's tools. Never let a late completion revive a stale name.
     if (signal?.aborted) return;
@@ -206,10 +229,11 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
 
   void register({
     name: 'list-site-pages',
+    title: 'List site pages',
     description:
       'List every page of this personal website (a Souls-inspired home world) with what it contains and the landmark that leads to it. Use this first to orient yourself.',
-    inputSchema: { type: 'object', properties: {} },
-    annotations: { readOnlyHint: true },
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, untrustedContentHint: false },
     execute: () =>
       JSON.stringify({
         currentPage: router.current?.id ?? 'home',
@@ -226,23 +250,21 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
   // isn't on the About page, the result nudges them to travel there
   void register({
     name: 'get-about-me',
+    title: 'Get biography',
     description:
       "Return the author's short biography — the “About Me” section of the About page. Available from anywhere on the site. Read-only.",
-    inputSchema: { type: 'object', properties: {} },
-    annotations: { readOnlyHint: true },
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, untrustedContentHint: false },
     execute: () => {
-      const onAbout = (router.current?.id ?? 'home') === 'about';
-      if (onAbout) {
-        // already here — center the “About Me” section and flash a highlight
-        revealAboutMe();
-        return `${ABOUT_ME_TEXT}\n\n(Scrolled to the “About Me” section on this page.)`;
-      }
+      const visibleBio = document.querySelector<HTMLElement>('.article.about #about-me');
+      if (visibleBio) return cleanText(visibleBio.textContent).replace(/^ABOUT ME\s*/i, '');
       return `${ABOUT_ME_TEXT}\n\n(You are not on the About page. To see this in context — alongside interests and the WebMCP tools — go there with goto-site-page({ page: "about" }).)`;
     },
   });
 
   void register({
     name: 'goto-site-page',
+    title: 'Go to site page',
     description:
       'Immediately jump to a page of the site, as if resting at the bonfire and warping. For the scenic route through the home world, use walk-hero-to-landmark instead.',
     inputSchema: {
@@ -251,14 +273,17 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
         page: { type: 'string', enum: [...AREAS], description: 'Destination page id' },
       },
       required: ['page'],
+      additionalProperties: false,
     },
-    execute: async (p: { page?: string }) => {
+    annotations: { readOnlyHint: false, untrustedContentHint: false },
+    execute: async (p: { page?: string }, { signal }) => {
       const page = String(p?.page ?? '');
       if (!(AREAS as readonly string[]).includes(page)) {
         return `Unknown page "${page}". Valid pages: ${AREAS.join(', ')}.`;
       }
       if (router.current?.id === page) return `Already on page "${page}".`;
-      const ok = await router.go(page);
+      const ok = await router.go(page, true, signal);
+      throwIfCancelled(signal);
       return ok ? `Navigated to "${page}".` : `Could not go to "${page}" right now (a transition may already be in progress). Try again in a moment.`;
     },
   });
@@ -266,6 +291,7 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
   // universal: switch the UI language; available languages are the enum below
   void register({
     name: 'set-language',
+    title: 'Set interface language',
     description:
       `Switch the interface language. Available languages: ${LANGS.map((l) => `${l.id} (${l.label})`).join(', ')}. The whole UI retranslates in place.`,
     inputSchema: {
@@ -274,7 +300,9 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
         language: { type: 'string', enum: LANGS.map((l) => l.id), description: 'Target language code' },
       },
       required: ['language'],
+      additionalProperties: false,
     },
+    annotations: { readOnlyHint: false, untrustedContentHint: false },
     execute: (p: { language?: string }) => {
       const lang = String(p?.language ?? '');
       if (!LANGS.some((l) => l.id === lang)) {
@@ -301,6 +329,11 @@ function cleanText(value: string | null | undefined): string {
   return (value ?? '').replace(/\s+/g, ' ').trim();
 }
 
+function clipText(value: string, limit: number): string {
+  if (value.length <= limit) return value;
+  return `${value.slice(0, Math.max(0, limit - 3)).trimEnd()}...`;
+}
+
 function articleRoot(area: ArticleArea): HTMLElement | null {
   return document.querySelector<HTMLElement>(`.article.${area} .article-body`);
 }
@@ -310,6 +343,10 @@ function articleHeading(area: ArticleArea, heading: string): HTMLElement | null 
   if (!root) return null;
   return [...root.querySelectorAll<HTMLElement>('h1, h2')]
     .find((el) => cleanText(el.textContent).toLocaleLowerCase() === heading.toLocaleLowerCase()) ?? null;
+}
+
+function visibleCitation(): string {
+  return document.querySelector<HTMLElement>('.article.research .bibtex code')?.textContent?.trim() ?? BIBTEX;
 }
 
 function sectionText(area: ArticleArea, heading: string): string {
@@ -329,15 +366,7 @@ function pageOverview(area: ArticleArea): string {
     .filter((link) => !link.closest('.site-footer'))
     .map((link) => ({ label: cleanText(link.textContent), url: link.href }))
     .filter((link) => link.label && !seenLinks.has(link.url) && seenLinks.add(link.url));
-  const sections = config.sections.map((section) => {
-    const text = section.id === 'overview' ? summary : sectionText(area, section.heading);
-    return {
-      id: section.id,
-      heading: section.heading,
-      description: section.description,
-      preview: text.length > 360 ? `${text.slice(0, 357)}...` : text,
-    };
-  });
+  const sections = config.sections.map(({ id, heading, description }) => ({ id, heading, description }));
 
   return JSON.stringify({
     page: area,
@@ -346,7 +375,7 @@ function pageOverview(area: ArticleArea): string {
     summary,
     sections,
     links,
-  }, null, 2);
+  });
 }
 
 function focusPageSection(area: ArticleArea, sectionId: string): string {
@@ -369,16 +398,16 @@ function focusPageSection(area: ArticleArea, sectionId: string): string {
 function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
   const config = PAGE_CONTEXTS[area];
   const sectionIds = config.sections.map((section) => section.id);
-  const sectionDescription = config.sections.map((section) => `${section.id}: ${section.description}`).join('; ');
 
   // These two names intentionally stay stable while their page-specific
   // descriptions, enums, returned content, and visible effects are replaced.
   void register(
     {
       name: 'get-page-overview',
+      title: `Overview of ${config.label}`,
       description: `Return a structured overview of the currently mounted ${config.label} page, including its sections and links. Read-only.`,
       inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, untrustedContentHint: false },
       execute: () => pageOverview(area),
     },
     signal,
@@ -386,15 +415,17 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
   void register(
     {
       name: 'focus-page-section',
+      title: `Focus a ${config.label} section`,
       description: `Scroll to and briefly highlight a section of the currently mounted ${config.label} page.`,
       inputSchema: {
         type: 'object',
         properties: {
-          section: { type: 'string', enum: sectionIds, description: sectionDescription },
+          section: { type: 'string', enum: sectionIds, description: `Section id on ${config.label}; call get-page-overview to list the available sections.` },
         },
         required: ['section'],
         additionalProperties: false,
       },
+      annotations: { readOnlyHint: false, untrustedContentHint: false },
       execute: (p: { section?: string }) => focusPageSection(area, String(p?.section ?? '')),
     },
     signal,
@@ -404,9 +435,10 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     void register(
       {
         name: 'get-fluid-simulation',
+        title: 'Get fluid-simulation details',
         description: 'Return structured details for the real-time GPU fluid-simulation project shown on this page: recorded test scenes, capabilities, and test hardware. Read-only.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        annotations: { readOnlyHint: true },
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
           const root = articleRoot('projects');
           if (!root) return 'The Projects page is not mounted.';
@@ -418,9 +450,9 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
             project: 'Real-time GPU fluid simulation',
             summary: cleanText(root.querySelector('.abstract')?.textContent),
             scenes,
-            capabilities: sectionText('projects', 'SYSTEM CAPABILITIES'),
+            capabilities: clipText(sectionText('projects', 'SYSTEM CAPABILITIES'), 360),
             testHardware: sectionText('projects', 'EXPERIMENT SETUP'),
-          }, null, 2);
+          });
         },
       },
       signal,
@@ -431,25 +463,61 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     void register(
       {
         name: 'get-publications',
+        title: 'Get publications',
         description: 'Return the publications shown on this page as structured JSON (title, authors, venue, year, DOI, links, award).',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        annotations: { readOnlyHint: true },
-        execute: () => JSON.stringify(PUBLICATIONS),
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
+        execute: () => {
+          const root = articleRoot('research');
+          if (!root) return 'The Research page is not mounted.';
+          return JSON.stringify([...root.querySelectorAll<HTMLElement>('.item-card')].map((card) => {
+            const venueAndYear = cleanText(card.querySelector('.ic-type')?.textContent);
+            const yearMatch = venueAndYear.match(/,\s*(\d{4})$/);
+            const links = [...card.querySelectorAll<HTMLAnchorElement>('.article-links a')]
+              .map((link) => ({ label: cleanText(link.textContent), url: link.href }));
+            const doiUrl = links.find((link) => link.url.startsWith('https://doi.org/'))?.url;
+            return {
+              title: cleanText(card.querySelector('.ic-title')?.textContent),
+              authors: cleanText(card.querySelector('p em')?.textContent),
+              venue: yearMatch ? venueAndYear.slice(0, yearMatch.index) : venueAndYear,
+              year: yearMatch ? Number(yearMatch[1]) : null,
+              doi: doiUrl?.replace('https://doi.org/', '') ?? null,
+              award: cleanText(card.querySelector('.badge')?.textContent),
+              links,
+            };
+          }));
+        },
       },
       signal,
     );
     void register(
       {
         name: 'get-citation',
-        description: "Return the publication's BibTeX citation and attempt to copy it to the clipboard (mirrors the Copy button on the research page).",
+        title: 'Get BibTeX citation',
+        description: "Return the BibTeX citation currently shown on the Research page. This tool does not write to the clipboard. Read-only.",
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        execute: async () => {
-          let copied = false;
-          try {
-            await navigator.clipboard.writeText(BIBTEX);
-            copied = true;
-          } catch { /* clipboard may be blocked without a user gesture */ }
-          return `${copied ? 'Copied the BibTeX citation to the clipboard.' : 'Could not access the clipboard here; the BibTeX citation is below.'}\n\n${BIBTEX}`;
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
+        execute: () => visibleCitation(),
+      },
+      signal,
+    );
+    void register(
+      {
+        name: 'copy-citation',
+        title: 'Copy BibTeX citation',
+        description: "Copy the BibTeX citation visible on the Research page to the user's clipboard and show the same confirmation as the page's Copy button.",
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        annotations: { readOnlyHint: false, untrustedContentHint: false },
+        execute: async (_p: Record<string, never>, { signal: executionSignal }) => {
+          const citation = visibleCitation();
+          await navigator.clipboard.writeText(citation);
+          throwIfCancelled(executionSignal);
+          const copyButton = articleRoot('research')?.querySelector<HTMLButtonElement>('.bibtex-copy');
+          if (copyButton) {
+            copyButton.textContent = 'Copied';
+            window.setTimeout(() => { copyButton.textContent = 'Copy'; }, 1600);
+          }
+          return 'Copied the visible BibTeX citation to the clipboard.';
         },
       },
       signal,
@@ -460,9 +528,10 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     void register(
       {
         name: 'get-mod-details',
+        title: 'Get Mizuki Mod details',
         description: 'Return structured details for Mizuki Mod: headline statistics, its core mechanic, and the featured cards shown on this page. Read-only.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        annotations: { readOnlyHint: true },
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
           const root = articleRoot('mods');
           if (!root) return 'The Mods page is not mounted.';
@@ -474,16 +543,15 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
             name: cleanText(card.querySelector('.c-name')?.textContent),
             cost: cleanText(card.querySelector('.cost')?.textContent),
             type: cleanText(card.querySelector('.c-type')?.textContent),
-            description: cleanText(card.querySelector('.c-text')?.textContent),
           }));
           return JSON.stringify({
             mod: 'Mizuki Mod for Slay the Spire',
             summary: cleanText(root.querySelector('.abstract')?.textContent),
             stats,
-            coreMechanic: sectionText('mods', 'THE MECHANIC — NERVOUS IMPAIRMENT'),
+            coreMechanic: clipText(sectionText('mods', 'THE MECHANIC — NERVOUS IMPAIRMENT'), 480),
             featuredCards,
             workshopUrl: STEAM_URL,
-          }, null, 2);
+          });
         },
       },
       signal,
@@ -491,8 +559,10 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     void register(
       {
         name: 'goto_workshop_page',
+        title: 'Open Steam Workshop page',
         description: 'Navigate from the Mods page to the public Steam Workshop listing for Mizuki Mod.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        annotations: { readOnlyHint: false, untrustedContentHint: false },
         execute: () => {
           window.location.assign(STEAM_URL);
           return 'Navigating to the Mizuki Mod page on Steam Workshop.';
@@ -507,6 +577,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     void register(
       {
         name: 'read-zine-piece',
+        title: 'Read a zine piece',
         description: 'Return the plain-text content of one poem or editorial section from experimental Poetry. Read-only.',
         inputSchema: {
           type: 'object',
@@ -514,20 +585,20 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
             piece: {
               type: 'string',
               enum: pieces.map((piece) => piece.id),
-              description: pieces.map((piece) => `${piece.id}: ${piece.heading}`).join('; '),
+              description: 'Piece id from this page; call get-page-overview to list the available sections.',
             },
           },
           required: ['piece'],
           additionalProperties: false,
         },
-        annotations: { readOnlyHint: true },
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: (p: { piece?: string }) => {
           const pieceId = String(p?.piece ?? '');
           const piece = pieces.find((candidate) => candidate.id === pieceId);
           if (!piece) return `Unknown piece "${pieceId}". Valid pieces: ${pieces.map((candidate) => candidate.id).join(', ')}.`;
           const heading = articleHeading('zine', piece.heading);
           const paper = heading?.closest<HTMLElement>('.zine-paper');
-          return paper ? paper.innerText.trim() : `The "${piece.heading}" piece is not available right now.`;
+          return paper ? clipText(paper.innerText.trim(), 1500) : `The "${piece.heading}" piece is not available right now.`;
         },
       },
       signal,
@@ -538,9 +609,10 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     void register(
       {
         name: 'get-photography-captions',
+        title: 'Get photography captions',
         description: "List the titles of Yunhao Luo's photographs displayed on the About page. Read-only.",
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        annotations: { readOnlyHint: true },
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
           const root = articleRoot('about');
           if (!root) return 'The About page is not mounted.';
@@ -564,6 +636,7 @@ function syncContextTools(area: string): void {
     void register(
       {
         name: 'walk-hero-to-landmark',
+        title: 'Walk hero to landmark',
         description:
           'Walk the pixel hero across the home world to a named landmark. Set interact=true to also use the landmark on arrival (the bonfire opens the travel menu; other landmarks travel to their area).',
         inputSchema: {
@@ -572,18 +645,20 @@ function syncContextTools(area: string): void {
             landmark: {
               type: 'string',
               enum: [...LANDMARKS],
-              description: POIS.map((p) => `${p.id}: ${p.sub}`).join('; '),
+              description: 'Landmark id. Use list-site-pages for details; bonfire opens travel and the others lead to their content page.',
             },
             interact: { type: 'boolean', description: 'Interact with the landmark after arriving (default false)' },
           },
           required: ['landmark'],
+          additionalProperties: false,
         },
-        execute: (p: { landmark?: string; interact?: boolean }) => {
+        annotations: { readOnlyHint: false, untrustedContentHint: false },
+        execute: (p: { landmark?: string; interact?: boolean }, { signal: executionSignal }) => {
           const lm = String(p?.landmark ?? '');
           if (!(LANDMARKS as readonly string[]).includes(lm)) {
             return `Unknown landmark "${lm}". Valid landmarks: ${LANDMARKS.join(', ')}.`;
           }
-          return home.mcpWalkTo(lm, !!p?.interact);
+          return home.mcpWalkTo(lm, !!p?.interact, executionSignal);
         },
       },
       homeAbort.signal,
@@ -591,9 +666,10 @@ function syncContextTools(area: string): void {
     void register(
       {
         name: 'get-hero-status',
+        title: 'Get hero status',
         description: 'Report the hero’s current area, tile position, and the nearest landmark.',
-        inputSchema: { type: 'object', properties: {} },
-        annotations: { readOnlyHint: true },
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => home.mcpStatus(),
       },
       homeAbort.signal,

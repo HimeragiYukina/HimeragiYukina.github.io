@@ -42,15 +42,22 @@ export class Router {
     return this.levels.has(id) ? id : 'home';
   }
 
-  async go(id: string, pushHash = true): Promise<boolean> {
+  async go(id: string, pushHash = true, signal?: AbortSignal): Promise<boolean> {
     const next = this.levels.get(id);
-    if (!next || this.navigating || next === this.current) return false;
+    if (!next || this.navigating || next === this.current || signal?.aborted) return false;
     this.navigating = true;
     this.hideBanner();
 
     // fade to black
     this.fader.classList.remove('clear');
     await wait(560);
+    // Tool execution can be cancelled while the fade is running. Keep the
+    // current page mounted and restore visibility before releasing the router.
+    if (signal?.aborted) {
+      this.fader.classList.add('clear');
+      this.navigating = false;
+      return false;
+    }
 
     this.current?.unmount();
     this.stage.replaceChildren();

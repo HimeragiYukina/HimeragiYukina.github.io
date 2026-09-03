@@ -15,11 +15,11 @@ An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub w
 
 ## Technical Overview
 
-- **Application architecture:** Vite and TypeScript without a frontend framework. The application uses a single `requestAnimationFrame` render loop and targets current versions of Google Chrome.
+- **Application architecture:** Vite and TypeScript without a frontend framework. The application uses a single `requestAnimationFrame` render loop and builds for Chrome 149+, the challenge's minimum supported Chrome version.
 - **HD-2D rendering:** The hub world is rendered with Canvas 2D at an internal pixel-art resolution of approximately 270p, then scaled with nearest-neighbor interpolation. The rendering pipeline includes emissive bloom, tilt-shift depth blur, dynamic multiply-blend lighting, ember, ash, and fog particle systems, and color grading.
 - **Procedural artwork:** Sprites, tiles, the moon, and the distant castle are generated at startup by deterministic procedural rendering functions in [src/engine/sprites.ts](src/engine/sprites.ts). Photographs, mod artwork, and the publication preview are distributed as display-resolution WebP assets; full-resolution source files are excluded from the application bundle.
 - **Internationalization:** The interface supports English and Simplified Chinese through [src/i18n.ts](src/i18n.ts). The language selector updates interface text without reloading the page. Chinese text uses the reader's system serif font when available, with a 17 KB subset of Noto Serif SC as a glyph fallback. The subset is restricted by `unicode-range` and loaded only when required. After modifying Chinese interface strings, regenerate the subset with `npm run subset-cjk`.
-- **WebMCP integration:** [src/webmcp.ts](src/webmcp.ts) registers tools on `document.modelContext` when a compatible model-context host is available. The surface follows the active page: global tools stay available; page tools register only where their actions and data make sense; and `AbortController` removes them on departure. The same `get-page-overview` and `focus-page-section` names are re-registered with page-specific descriptions, input enums, results, and visible effects.
+- **WebMCP integration:** [src/webmcp.ts](src/webmcp.ts) registers tools on `document.modelContext` when a compatible model-context host is available. The surface follows the active page: global tools stay available; page tools register only where their actions and data make sense; and `AbortController` removes them on departure. The same `get-page-overview` and `focus-page-section` names are re-registered with page-specific descriptions, input enums, results, and visible effects. Definitions include human-readable titles, strict schemas, read-only and trust annotations, cancellation-aware execution, and descriptions/results kept within Chrome's recommended character budgets.
 - **Agent-readable metadata:** [public/llms.txt](public/llms.txt) describes the site areas and WebMCP tools for AI agents. It is served at `/llms.txt` alongside `/robots.txt`. Fonts use self-hosted WOFF2 subsets, and all pages are optimized for high Lighthouse scores across the available audit categories.
 
 ## WebMCP Tools by Page
@@ -30,7 +30,7 @@ An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub w
 | Home | `walk-hero-to-landmark`, `get-hero-status` |
 | Every content page | `get-page-overview`, `focus-page-section` — redefined for the current page |
 | Projects | `get-fluid-simulation` |
-| Research | `get-publications`, `get-citation` |
+| Research | `get-publications`, `get-citation`, `copy-citation` |
 | Mods | `get-mod-details`, `goto_workshop_page` |
 | The Zine | `read-zine-piece` |
 | About | `get-photography-captions` |

@@ -26,7 +26,7 @@ if (new URLSearchParams(location.search).has('mockmcp') && !(document as any).mo
     async call(name: string, params: any = {}) {
       const t = tools.find((q) => q.name === name);
       if (!t) throw new Error(`no such tool: ${name}`);
-      return t.execute(params);
+      return t.execute(params, { signal: new AbortController().signal });
     },
   };
   (document as any).modelContext = mock;

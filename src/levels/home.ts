@@ -490,11 +490,21 @@ export class HomeLevel implements Level {
   /* ---------------- WebMCP hooks ---------------- */
 
   /** Walk to a landmark and optionally interact; returns a status string. */
-  async mcpWalkTo(poiId: string, interact: boolean): Promise<string> {
+  async mcpWalkTo(poiId: string, interact: boolean, signal?: AbortSignal): Promise<string> {
     if (this.router.current?.id !== 'home') return 'The hero is not in the home world right now. Use goto-site-page({ page: "home" }) first.';
     const p = POIS.find((q) => q.id === poiId);
     if (!p) return `Unknown landmark "${poiId}".`;
-    const ok = await this.world!.walkToPOI(p.id);
+    if (signal?.aborted) throw signal.reason ?? new DOMException('The walk was cancelled.', 'AbortError');
+    const world = this.world!;
+    const stop = () => world.cancelPath(false);
+    signal?.addEventListener('abort', stop, { once: true });
+    let ok = false;
+    try {
+      ok = await world.walkToPOI(p.id);
+    } finally {
+      signal?.removeEventListener('abort', stop);
+    }
+    if (signal?.aborted) throw signal.reason ?? new DOMException('The walk was cancelled.', 'AbortError');
     if (!ok) return `The hero could not find a path to ${p.label}.`;
     if (interact) {
       this.trigger(p);
