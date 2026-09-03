@@ -307,12 +307,17 @@ body { background: transparent; }
   overflow-y: auto;
   padding: 18px;
   color: var(--ink);
-  background: linear-gradient(145deg, rgba(32, 36, 48, 0.96), rgba(8, 10, 16, 0.96));
-  border: 1px solid rgba(201, 169, 89, 0.52);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.13), rgba(255,255,255,0.025)),
+    rgba(6, 8, 13, 0.84);
+  border: 1px solid rgba(255,255,255,0.22);
   border-radius: 12px;
-  box-shadow: 0 18px 55px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,255,255,0.1);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -12px 24px rgba(255,255,255,0.025),
+    0 18px 55px rgba(0,0,0,0.62);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
 }
 #portfolio-tour header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 #portfolio-tour h2 {
@@ -331,16 +336,32 @@ body { background: transparent; }
   text-transform: uppercase;
 }
 .tour-close {
+  position: relative;
+  display: grid;
+  place-items: center;
   flex: 0 0 30px;
   width: 30px;
   height: 30px;
+  padding: 0;
   color: var(--ink-dim);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.16);
+  background: linear-gradient(145deg, rgba(255,255,255,0.11), rgba(255,255,255,0.025)), rgba(6,8,13,0.55);
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 999px;
-  font: 20px/1 var(--serif);
   cursor: pointer;
 }
+.tour-close::before,
+.tour-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: center;
+}
+.tour-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.tour-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 .tour-close:hover, .tour-close:focus-visible { color: #fff; border-color: var(--gold); outline: none; }
 .tour-intro { margin: 12px 0; color: var(--ink-dim); font-size: 14px; line-height: 1.35; }
 #portfolio-tour ol { display: grid; gap: 7px; list-style: none; }

@@ -267,7 +267,6 @@ function createPortfolioTour(goal: TourGoal, router: Router): string {
   close.className = 'tour-close';
   close.type = 'button';
   close.setAttribute('aria-label', 'Close portfolio tour');
-  close.textContent = '×';
   close.addEventListener('click', () => panel.remove());
   header.append(headingGroup, close);
 
