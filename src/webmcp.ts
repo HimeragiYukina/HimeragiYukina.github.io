@@ -555,6 +555,33 @@ function pageOverview(area: ArticleArea): string {
   });
 }
 
+/**
+ * `scrollIntoView({ block: 'center' })` cannot center content near the start of
+ * a scroll container because there is no scrollable space above it. When an
+ * overview is focused, add only the missing leading space to the article body
+ * before scrolling. This keeps the introduction at the viewport midpoint and
+ * clear of the overlaid liquid-glass top bar without changing normal page
+ * loads. The extra padding also contributes to scrollHeight, so the end of the
+ * article remains reachable.
+ */
+function makeStartContentCenterable(target: HTMLElement): void {
+  const scroller = target.closest<HTMLElement>('.article');
+  const body = target.closest<HTMLElement>('.article-body');
+  if (!scroller || !body || scroller.scrollTop > 1) return;
+
+  const targetRect = target.getBoundingClientRect();
+  const scrollerRect = scroller.getBoundingClientRect();
+  const targetCenter = (targetRect.top + targetRect.bottom) / 2;
+  const viewportCenter = scrollerRect.top + scroller.clientHeight / 2;
+  const missingSpace = viewportCenter - targetCenter;
+  if (missingSpace <= 1) return;
+
+  const bodyStyle = getComputedStyle(body);
+  const zoom = Number.parseFloat(bodyStyle.zoom) || 1;
+  const existingSpace = Number.parseFloat(body.style.getPropertyValue('--webmcp-start-space')) || 0;
+  body.style.setProperty('--webmcp-start-space', `${existingSpace + missingSpace / zoom}px`);
+}
+
 function focusPageSection(area: ArticleArea, sectionId: string): string {
   const config = PAGE_CONTEXTS[area];
   const section = config.sections.find((candidate) => candidate.id === sectionId);
@@ -573,6 +600,7 @@ function focusPageSection(area: ArticleArea, sectionId: string): string {
   document.querySelectorAll('.webmcp-focus').forEach((el) => el.classList.remove('webmcp-focus'));
   // Centering keeps the focused content clear of the liquid-glass top bar,
   // whose responsive height overlays the top of every article page.
+  if (intro) makeStartContentCenterable(target);
   target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   target.classList.add('webmcp-focus');
   window.setTimeout(() => target.classList.remove('webmcp-focus'), 1800);
