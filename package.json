@@ -10,6 +10,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "test:webmcp": "npm run build && node scripts/webmcp-smoke.mjs",
     "perf": "npm run build && node scripts/perf.mjs",
     "subset-cjk": "node scripts/subset-cjk.mjs"
   },

@@ -40,7 +40,9 @@ The extension turns the earlier tool collection into a fuller page-aware interfa
 
 The challenge extension is checked in two WebMCP-capable clients:
 
-- ChatGPT's in-app browser; and
+- OpenAI Codex's in-app browser; and
 - Google Chrome 151 with WebMCP testing enabled.
 
 Route tests verify both sides of the lifecycle: a page's exclusive tools appear after navigation and disappear after leaving. Browser checks also verify that route-specific metadata follows the active page. `npm run build` type-checks the complete registration layer before producing the deployable site.
+
+For a repeatable local check, `npm run test:webmcp` runs the production build in headless Chrome with the site's mock model-context host. It verifies the six route-specific tool surfaces, route cleanup, the visible tour and focus effects, `get-about-me` read-only behavior, citation structure, and the recommended name, description, parameter, and result budgets.
