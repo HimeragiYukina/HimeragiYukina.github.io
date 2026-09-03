@@ -1088,7 +1088,7 @@ body { background: transparent; }
   padding: 72px 28px 120px;
   /* start below the top bar whatever its stacked height (--topbar-h is real
      screen px; JS converts it into this zoomed element's coordinate space) */
-  padding-top: calc(max(72px, var(--article-topbar-offset, 0px)) + var(--webmcp-start-space, 0px));
+  padding-top: max(72px, var(--article-topbar-offset, 0px));
   /* every article renders 25% larger; overlays outside it (the WebMCP chip,
      the back button) keep their site-wide size and position */
   zoom: calc(1.25 * var(--text-scale));
