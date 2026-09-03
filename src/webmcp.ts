@@ -15,10 +15,12 @@
  *      · global: list-site-pages, get-about-me, goto-site-page, set-language
  *      · home only: walk-hero-to-landmark, get-hero-status
  *      · research only: get-publications, get-citation
+ *      · mods only: goto_workshop_page
  */
 import type { Router } from './router';
 import type { HomeLevel } from './levels/home';
 import { PUBLICATIONS, BIBTEX } from './levels/papers';
+import { STEAM_URL } from './levels/mod';
 import { POIS } from './engine/world';
 import { ABOUT_ME_TEXT, revealAboutMe } from './content/aboutMe';
 import { LANGS, getLang, setLang, type Lang } from './i18n';
@@ -58,6 +60,7 @@ let ctxRef: { router: Router; home: HomeLevel } | null = null;
 let mc: ModelContext | null = null;
 let homeAbort: AbortController | null = null;
 let researchAbort: AbortController | null = null;
+let modsAbort: AbortController | null = null;
 let registeredNames: string[] = [];
 
 /** Static tool metadata for the About page (kept in sync with registration below). */
@@ -71,6 +74,7 @@ export function describeTools(): { name: string; summary: string; readOnly: bool
     { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby (only while exploring the home world)', readOnly: true },
     { name: 'get-publications', summary: 'returns first-author publications as structured JSON (only on the research page)', readOnly: true },
     { name: 'get-citation', summary: 'returns the BibTeX citation and attempts to copy it to the clipboard (only on the research page)', readOnly: false },
+    { name: 'goto_workshop_page', summary: 'opens the Mizuki Mod Steam Workshop listing (only on the Mods page)', readOnly: false },
   ];
 }
 
@@ -280,6 +284,26 @@ function syncContextTools(area: string): void {
     researchAbort.abort();
     researchAbort = null;
     registeredNames = registeredNames.filter((n) => n !== 'get-publications' && n !== 'get-citation');
+  }
+
+  if (area === 'mods' && !modsAbort) {
+    modsAbort = new AbortController();
+    void register(
+      {
+        name: 'goto_workshop_page',
+        description: 'Navigate from the Mods page to the public Steam Workshop listing for Mizuki Mod.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        execute: () => {
+          window.location.assign(STEAM_URL);
+          return 'Navigating to the Mizuki Mod page on Steam Workshop.';
+        },
+      },
+      modsAbort.signal,
+    );
+  } else if (area !== 'mods' && modsAbort) {
+    modsAbort.abort();
+    modsAbort = null;
+    registeredNames = registeredNames.filter((n) => n !== 'goto_workshop_page');
   }
 
   updateChip();

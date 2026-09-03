@@ -24,7 +24,7 @@ import shotCombat from '../assets/mods/mizuki/gallery/screenshot-2.webp';
 import shotCards from '../assets/mods/mizuki/gallery/screenshot-3.webp';
 import shotCardView from '../assets/mods/mizuki/gallery/screenshot-4.webp';
 
-const STEAM_URL = 'https://steamcommunity.com/sharedfiles/filedetails/?id=3764504027';
+export const STEAM_URL = 'https://steamcommunity.com/sharedfiles/filedetails/?id=3764504027';
 const GITHUB_URL = 'https://github.com/HimeragiYukina/mizuki-mod-sts';
 
 // hero slideshow: the Workshop preview, then the in-game captures

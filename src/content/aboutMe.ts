@@ -6,7 +6,7 @@
 
 /** Paragraphs of the bio, as HTML (bold + in-site links). */
 export const ABOUT_ME_HTML: string[] = [
-  `I am <b>Yunhao Luo</b>, an AI researcher at Huawei's Web Technology Lab. I previously
+  `I am <b>Yunhao Luo</b>, an AI researcher at Huawei Canada's Web Technology Lab. I previously
    researched real-time GPU fluid simulation at Ubisoft La Forge and hold an M.Sc. in Computer
    Science from McGill University, where my thesis work on physically simulated hand control
    received the Best Presentation Award at MIG '21.`,
