@@ -1,6 +1,6 @@
 # Yunhao Luo's Personal Website
 
-A playable personal portfolio presented as an HD-2D, Souls-inspired JRPG hub world. Visitors can explore it using keyboard, mouse, or touch controls, while a WebMCP-capable agent can collaborate through the same page UI. Each landmark provides access to a distinct section of the site.
+A non-commercial, playable personal portfolio presented as an HD-2D, Souls-inspired JRPG hub world. Visitors can explore it using keyboard, mouse, or touch controls, while a WebMCP-capable agent can collaborate through the same page UI. Each landmark provides access to a distinct section of the site.
 
 ## Site Areas
 
@@ -96,6 +96,6 @@ The `npm run perf` command cannot audit WebMCP tools because headless Chrome doe
 This project uses separate licenses for source code and creative content:
 
 - **Source code:** Licensed under the [MIT License](LICENSE).
-- **Creative content:** Photographs, the poetry zine, and generated artwork are copyright © 2026 Yunhao Luo and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/). See [LICENSE-CONTENT](LICENSE-CONTENT) for details.
+- **Creative content:** Photographs, the poetry zine, and original environment and effects artwork are copyright © 2026 Yunhao Luo and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/). See [LICENSE-CONTENT](LICENSE-CONTENT) for details.
 
-Third-party assets and character rights are excluded from both licenses. Mizuki is an *Arknights* character © Hypergryph. The Mizuki avatar artwork is by [QuAn_](https://www.pixiv.net/en/users/6657532), who has expressly allowed anyone to use that avatar artwork freely; this artwork permission does not transfer the underlying character rights. Other third-party material includes the MIG '21 publication figure published by ACM and adapted ASCII artwork attributed in the zine's Works Cited section. Fluid-simulation videos are included with Ubisoft's permission. See [LICENSE-CONTENT](LICENSE-CONTENT) for complete licensing and attribution information.
+Third-party assets and character rights are excluded from both licenses. Mizuki is an *Arknights* character © Hypergryph. The Mizuki avatar artwork is by [QuAn_](https://www.pixiv.net/en/users/6657532), who has expressly allowed anyone to use that avatar artwork freely; this artwork permission does not transfer the underlying character rights. Mizuki Mod is a non-commercial, [open-source fan mod](https://github.com/HimeragiYukina/mizuki-mod-sts), and its character and game ownership notices appear both in that repository and on its [Steam Workshop listing](https://steamcommunity.com/sharedfiles/filedetails/?id=3764504027). Other third-party material includes the MIG '21 publication figure published by ACM and adapted ASCII artwork attributed in the zine's Works Cited section. Fluid-simulation videos are included with Ubisoft's permission. See [LICENSE-CONTENT](LICENSE-CONTENT) for complete licensing and attribution information.

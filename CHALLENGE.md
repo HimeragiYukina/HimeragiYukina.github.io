@@ -34,7 +34,7 @@ The extension turns the earlier tool collection into a fuller page-aware interfa
 - **Safer lifecycle handling.** Every content-page tool shares a route-owned `AbortController`, and late asynchronous registrations are ignored after their route signal is aborted. This prevents stale tools from leaking across rapid navigation.
 - **Secure-tool hardening.** Each definition now has a human-readable title, a strict JSON schema, explicit read/trust annotations, and an execution cancellation signal. Parameter descriptions and individual results are kept within Chrome's recommended character budgets.
 - **Discoverability.** Homepage metadata describes the portfolio as playable by keyboard, mouse, touch controls, or WebMCP. Each mounted area updates its browser, Open Graph, and link-preview metadata, while the About page, README, and `/llms.txt` explain the context-dependent tool surface. The public identity exposes only GitHub and LinkedIn profiles.
-- **Rights documentation.** The repository separates MIT-licensed code, CC BY-NC-ND original content, and third-party material. It records QuAn_'s permission for anyone to use the Mizuki avatar artwork while separately attributing the underlying *Arknights* character to Hypergryph.
+- **Rights documentation.** The repository separates MIT-licensed code, CC BY-NC-ND original content, and third-party material. It records that this is a non-commercial personal website, documents QuAn_'s permission for anyone to use the Mizuki avatar artwork, and separately attributes the underlying *Arknights* character to Hypergryph. The non-commercial, open-source Mizuki fan mod carries character and game ownership notices on its site page, Steam Workshop listing, and GitHub repository.
 
 ## Verification
 

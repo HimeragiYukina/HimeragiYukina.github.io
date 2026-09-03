@@ -13,6 +13,10 @@ The original creative content of this repository — the photographs in
 You may share it with attribution, for non-commercial purposes, without
 modification. All other rights are reserved.
 
+This repository powers Yunhao Luo's non-commercial personal website. That
+context does not change the ownership or reuse terms of any third-party
+material listed below.
+
 Third-party assets (NOT covered by the above)
 ----------------------------------------------
 
@@ -42,6 +46,8 @@ Third-party assets (NOT covered by the above)
 - The Mizuki mod images in `src/assets/mods/mizuki/` (the Workshop
   preview, card art, relic icons and in-game screenshots) are official
   Arknights content © Hypergryph, with card frames / UI / gameplay
-  © Mega Crit (Slay the Spire), shown here as part of a non-commercial
-  fan mod unaffiliated with either company. They are not licensed for
-  reuse.
+  © Mega Crit (Slay the Spire). They are shown here as part of Mizuki Mod,
+  a non-commercial, open-source fan mod unaffiliated with either company.
+  Character and game ownership are also disclosed on the mod's Steam
+  Workshop listing and GitHub repository. These images are not licensed
+  for reuse by this repository.
