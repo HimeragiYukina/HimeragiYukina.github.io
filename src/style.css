@@ -1535,6 +1535,12 @@ body { background: transparent; }
   100% { background: rgba(201,169,89,0); box-shadow: 0 0 0 10px rgba(201,169,89,0); }
 }
 .about-flash { animation: about-flash 1.8s ease-out; }
+/* focus-page-section reuses the same no-layout-shift pulse so a human can see
+   exactly which part of the page an agent selected. */
+.webmcp-focus {
+  border-radius: 12px;
+  animation: about-flash 1.8s ease-out;
+}
 
 /* BibTeX citation block (research page) — a dark code panel with a copy button */
 .bibtex {

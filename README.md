@@ -19,8 +19,25 @@ An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub w
 - **HD-2D rendering:** The hub world is rendered with Canvas 2D at an internal pixel-art resolution of approximately 270p, then scaled with nearest-neighbor interpolation. The rendering pipeline includes emissive bloom, tilt-shift depth blur, dynamic multiply-blend lighting, ember, ash, and fog particle systems, and color grading.
 - **Procedural artwork:** Sprites, tiles, the moon, and the distant castle are generated at startup by deterministic procedural rendering functions in [src/engine/sprites.ts](src/engine/sprites.ts). Photographs, mod artwork, and the publication preview are distributed as display-resolution WebP assets; full-resolution source files are excluded from the application bundle.
 - **Internationalization:** The interface supports English and Simplified Chinese through [src/i18n.ts](src/i18n.ts). The language selector updates interface text without reloading the page. Chinese text uses the reader's system serif font when available, with a 17 KB subset of Noto Serif SC as a glyph fallback. The subset is restricted by `unicode-range` and loaded only when required. After modifying Chinese interface strings, regenerate the subset with `npm run subset-cjk`.
-- **WebMCP integration:** [src/webmcp.ts](src/webmcp.ts) registers tools on `document.modelContext` when a compatible model-context host is available. Global tools include `list-site-pages`, `get-about-me`, `goto-site-page`, and `set-language`. The home area provides `walk-hero-to-landmark` and `get-hero-status`; the Research area provides `get-publications` and `get-citation`; the Mods area provides `goto_workshop_page`. Page-scoped tools are unregistered through `AbortController` when the active area changes.
+- **WebMCP integration:** [src/webmcp.ts](src/webmcp.ts) registers tools on `document.modelContext` when a compatible model-context host is available. The surface follows the active page: global tools stay available; page tools register only where their actions and data make sense; and `AbortController` removes them on departure. The same `get-page-overview` and `focus-page-section` names are re-registered with page-specific descriptions, input enums, results, and visible effects.
 - **Agent-readable metadata:** [public/llms.txt](public/llms.txt) describes the site areas and WebMCP tools for AI agents. It is served at `/llms.txt` alongside `/robots.txt`. Fonts use self-hosted WOFF2 subsets, and all pages are optimized for high Lighthouse scores across the available audit categories.
+
+## WebMCP Tools by Page
+
+| Scope | Tools |
+| --- | --- |
+| Every page | `list-site-pages`, `get-about-me`, `goto-site-page`, `set-language` |
+| Home | `walk-hero-to-landmark`, `get-hero-status` |
+| Every content page | `get-page-overview`, `focus-page-section` — redefined for the current page |
+| Projects | `get-fluid-simulation` |
+| Research | `get-publications`, `get-citation` |
+| Mods | `get-mod-details`, `goto_workshop_page` |
+| The Zine | `read-zine-piece` |
+| About | `get-photography-captions` |
+
+## WebMCP Challenge Extension
+
+This site predates the OpenAI WebMCP Challenge. The latest pre-challenge baseline is commit [`5acdbc7`](https://github.com/HimeragiYukina/HimeragiYukina.github.io/commit/5acdbc7). Challenge-period work is documented separately in [CHALLENGE.md](CHALLENGE.md), with the Git range `5acdbc7..main` providing timestamped evidence of the new implementation.
 
 ## Local Development
 

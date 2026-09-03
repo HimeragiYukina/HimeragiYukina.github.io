@@ -63,6 +63,12 @@ export function makeAboutLevel(router: Router) {
         <ul>
           ${tools.map((t) => `<li><b>${t.name}</b> — ${t.summary}${t.readOnly ? ' <em>(read-only)</em>' : ''}</li>`).join('')}
         </ul>
+        <p>
+          The tool surface is <b>page-aware</b>. Global tools remain available everywhere, while
+          page-scoped tools are registered only where they can succeed and are removed on departure.
+          The shared names <code>get-page-overview</code> and <code>focus-page-section</code> are deliberately
+          redefined on each content page with that page's own description, section enum, data, and visible effect.
+        </p>
         <p><em>The indicator in the bottom-right corner reports whether a model-context host was detected on this page.</em></p>
       </section>
     `;

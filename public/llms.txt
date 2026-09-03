@@ -4,7 +4,9 @@
 
 Yunhao Luo is an AI researcher at Huawei Canada's Web Technology Lab. He previously researched real-time GPU fluid simulation at Ubisoft La Forge and holds an M.Sc. in Computer Science from McGill University; his thesis work received the Best Presentation Award at MIG '21.
 
-For AI agents: this site registers WebMCP tools on `document.modelContext` (list-site-pages, get-about-me, goto-site-page, set-language, walk-hero-to-landmark, get-hero-status, get-publications, get-citation, goto_workshop_page). An agent in a WebMCP-capable browser can operate the site directly — jump between pages, switch language, walk the hero, read the bio and structured publication data, get the citation, and open the Mizuki Mod's Steam Workshop listing from the Mods page.
+For AI agents: this site registers WebMCP tools on `document.modelContext`. Four global tools stay available everywhere: `list-site-pages`, `get-about-me`, `goto-site-page`, and `set-language`. The remaining tools follow the active page and are removed when the visitor leaves it. On every content page, `get-page-overview` and `focus-page-section` are re-registered with that page's own description, section enum, returned data, and visible effect.
+
+Page tools: Home provides `walk-hero-to-landmark` and `get-hero-status`; Projects provides `get-fluid-simulation`; Research provides `get-publications` and `get-citation`; Mods provides `get-mod-details` and `goto_workshop_page`; The Zine provides `read-zine-piece`; About provides `get-photography-captions`.
 
 ## Areas
 
