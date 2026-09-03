@@ -32,7 +32,7 @@ import { ABOUT_ME_TEXT } from './content/aboutMe';
 import { LANGS, getLang, setLang, type Lang } from './i18n';
 
 interface ToolExecuteOptions {
-  signal: AbortSignal;
+  signal?: AbortSignal;
 }
 interface ToolAnnotations {
   readOnlyHint?: boolean;
@@ -43,7 +43,7 @@ interface ToolDefinition {
   title: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  execute: (params: any, options: ToolExecuteOptions) => Promise<string | null> | string | null;
+  execute: (params: any, options?: ToolExecuteOptions) => Promise<string | null> | string | null;
   annotations?: ToolAnnotations;
 }
 interface ModelContext {
@@ -429,7 +429,7 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
       additionalProperties: false,
     },
     annotations: { readOnlyHint: false, untrustedContentHint: false },
-    execute: async (p: { page?: string }, { signal }) => {
+    execute: async (p: { page?: string }, { signal } = {}) => {
       const page = String(p?.page ?? '');
       if (!(AREAS as readonly string[]).includes(page)) {
         return `Unknown page "${page}". Valid pages: ${AREAS.join(', ')}.`;
@@ -692,7 +692,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
         description: "Copy the complete BibTeX citation to the user's clipboard and update the visible Copy confirmation.",
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: false, untrustedContentHint: false },
-        execute: async (_p: Record<string, never>, { signal: executionSignal }) => {
+        execute: async (_p: Record<string, never>, { signal: executionSignal } = {}) => {
           const citation = visibleCitation();
           await navigator.clipboard.writeText(citation);
           throwIfCancelled(executionSignal);
@@ -837,7 +837,7 @@ function syncContextTools(area: string): void {
           additionalProperties: false,
         },
         annotations: { readOnlyHint: false, untrustedContentHint: false },
-        execute: (p: { landmark?: string; interact?: boolean }, { signal: executionSignal }) => {
+        execute: (p: { landmark?: string; interact?: boolean }, { signal: executionSignal } = {}) => {
           const lm = String(p?.landmark ?? '');
           if (!(LANDMARKS as readonly string[]).includes(lm)) {
             return `Unknown landmark "${lm}". Valid landmarks: ${LANDMARKS.join(', ')}.`;
