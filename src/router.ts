@@ -1,4 +1,6 @@
 /** Hash router with souls-style fade + area-name banner between levels. */
+import { updatePageMetadata } from './metadata';
+
 export interface Level {
   id: string;
   banner: string;
@@ -67,6 +69,7 @@ export class Router {
       if (location.hash !== h) history.pushState(null, '', h);
     }
     next.mount(this.stage);
+    updatePageMetadata(id);
     for (const cb of this.changeListeners) cb(id);
 
     await wait(60);
