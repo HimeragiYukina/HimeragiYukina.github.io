@@ -228,22 +228,22 @@ let registeredNames: string[] = [];
 export function describeTools(): { name: string; summary: string; readOnly: boolean }[] {
   return [
     { name: 'list-site-pages', summary: 'lists every page of the site and how to reach it', readOnly: true },
-    { name: 'get-about-me', summary: "returns the author's bio (the About page's “About Me”)", readOnly: true },
+    { name: 'get-about-me', summary: "returns the author's short biography", readOnly: true },
     { name: 'goto-site-page', summary: `jumps to a page (${AREAS.join(', ')}) — like resting at the bonfire`, readOnly: false },
     { name: 'set-language', summary: `switches the UI language (${LANGS.map((l) => l.id).join(', ')})`, readOnly: false },
     { name: 'create-portfolio-tour', summary: 'creates a visible, goal-specific route that the visitor and agent can follow together', readOnly: false },
-    { name: 'walk-hero-to-landmark', summary: 'walks the pixel hero to a landmark, optionally interacting (only while exploring the home world)', readOnly: false },
-    { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby (only while exploring the home world)', readOnly: true },
-    { name: 'get-page-overview', summary: 'returns the current content page as structured JSON; its result changes with the page', readOnly: true },
-    { name: 'focus-page-section', summary: 'scrolls to and highlights a section; its allowed sections change with the page', readOnly: false },
-    { name: 'get-fluid-simulation', summary: 'returns the project’s test scenes and technical capabilities (only on Projects)', readOnly: true },
-    { name: 'get-publications', summary: 'returns first-author publications as structured JSON (only on the research page)', readOnly: true },
-    { name: 'get-citation', summary: 'returns the BibTeX citation shown on Research (only on the research page)', readOnly: true },
-    { name: 'copy-citation', summary: 'copies the visible BibTeX citation to the clipboard (only on the research page)', readOnly: false },
-    { name: 'get-mod-details', summary: 'returns mod statistics, mechanics, and featured cards (only on Mods)', readOnly: true },
-    { name: 'goto_workshop_page', summary: 'opens the Mizuki Mod Steam Workshop listing (only on the Mods page)', readOnly: false },
-    { name: 'read-zine-piece', summary: 'returns one poem or section by id (only in The Zine)', readOnly: true },
-    { name: 'get-photography-captions', summary: 'lists the photographs on the About page (only on About)', readOnly: true },
+    { name: 'walk-hero-to-landmark', summary: 'walks the pixel hero to a landmark and optionally interacts with it', readOnly: false },
+    { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby', readOnly: true },
+    { name: 'get-page-overview', summary: 'returns the active content as structured JSON', readOnly: true },
+    { name: 'focus-page-section', summary: 'scrolls to and highlights a section', readOnly: false },
+    { name: 'get-fluid-simulation', summary: 'returns test scenes and technical capabilities for the fluid simulator', readOnly: true },
+    { name: 'get-publications', summary: 'returns first-author publications as structured JSON', readOnly: true },
+    { name: 'get-citation', summary: 'returns the complete BibTeX citation without copying it', readOnly: true },
+    { name: 'copy-citation', summary: 'copies the complete BibTeX citation to the clipboard', readOnly: false },
+    { name: 'get-mod-details', summary: 'returns mod statistics, mechanics, and featured cards', readOnly: true },
+    { name: 'goto_workshop_page', summary: 'opens the Mizuki Mod Steam Workshop listing', readOnly: false },
+    { name: 'read-zine-piece', summary: 'returns one poem or editorial section by id', readOnly: true },
+    { name: 'get-photography-captions', summary: 'lists the titles of Yunhao Luo’s portfolio photographs', readOnly: true },
   ];
 }
 
@@ -396,8 +396,7 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
   void register({
     name: 'get-about-me',
     title: 'Get biography',
-    description:
-      "Return the author's short biography — the “About Me” section of the About page. Available from anywhere on the site. Read-only.",
+    description: "Return the author's short biography.",
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: true, untrustedContentHint: false },
     execute: () => {
@@ -581,7 +580,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     {
       name: 'get-page-overview',
       title: `Overview of ${config.label}`,
-      description: `Return a structured overview of the currently mounted ${config.label} page, including its sections and links. Read-only.`,
+      description: `Return a structured overview of ${config.label}, including sections and links.`,
       inputSchema: { type: 'object', properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: false },
       execute: () => pageOverview(area),
@@ -592,11 +591,11 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
     {
       name: 'focus-page-section',
       title: `Focus a ${config.label} section`,
-      description: `Scroll to and briefly highlight a section of the currently mounted ${config.label} page.`,
+      description: `Scroll to and briefly highlight a section of ${config.label}.`,
       inputSchema: {
         type: 'object',
         properties: {
-          section: { type: 'string', enum: sectionIds, description: `Section id on ${config.label}; call get-page-overview to list the available sections.` },
+          section: { type: 'string', enum: sectionIds, description: 'Section id; call get-page-overview to list the available sections.' },
         },
         required: ['section'],
         additionalProperties: false,
@@ -612,7 +611,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'get-fluid-simulation',
         title: 'Get fluid-simulation details',
-        description: 'Return structured details for the real-time GPU fluid-simulation project shown on this page: recorded test scenes, capabilities, and test hardware. Read-only.',
+        description: 'Return the real-time GPU fluid simulator’s recorded test scenes, capabilities, and test hardware.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
@@ -640,7 +639,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'get-publications',
         title: 'Get publications',
-        description: 'Return the publications shown on this page as structured JSON (title, authors, venue, year, DOI, links, award).',
+        description: 'Return publication metadata as structured JSON: title, authors, venue, year, DOI, links, and award.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
@@ -670,7 +669,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'get-citation',
         title: 'Get BibTeX citation',
-        description: "Return the BibTeX citation currently shown on the Research page. This tool does not write to the clipboard. Read-only.",
+        description: 'Return the complete BibTeX citation without copying it.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => visibleCitation(),
@@ -681,7 +680,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'copy-citation',
         title: 'Copy BibTeX citation',
-        description: "Copy the BibTeX citation visible on the Research page to the user's clipboard and show the same confirmation as the page's Copy button.",
+        description: "Copy the complete BibTeX citation to the user's clipboard and update the visible Copy confirmation.",
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: false, untrustedContentHint: false },
         execute: async (_p: Record<string, never>, { signal: executionSignal }) => {
@@ -705,7 +704,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'get-mod-details',
         title: 'Get Mizuki Mod details',
-        description: 'Return structured details for Mizuki Mod: headline statistics, its core mechanic, and the featured cards shown on this page. Read-only.',
+        description: 'Return Mizuki Mod’s headline statistics, core mechanic, and featured cards.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
@@ -736,7 +735,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'goto_workshop_page',
         title: 'Open Steam Workshop page',
-        description: 'Navigate from the Mods page to the public Steam Workshop listing for Mizuki Mod.',
+        description: 'Open the public Steam Workshop listing for Mizuki Mod.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: false, untrustedContentHint: false },
         execute: () => {
@@ -754,14 +753,14 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'read-zine-piece',
         title: 'Read a zine piece',
-        description: 'Return the plain-text content of one poem or editorial section from experimental Poetry. Read-only.',
+        description: 'Return one poem or editorial section from experimental Poetry as plain text.',
         inputSchema: {
           type: 'object',
           properties: {
             piece: {
               type: 'string',
               enum: pieces.map((piece) => piece.id),
-              description: 'Piece id from this page; call get-page-overview to list the available sections.',
+              description: 'Piece id; call get-page-overview to list the available sections.',
             },
           },
           required: ['piece'],
@@ -786,7 +785,7 @@ function registerArticleTools(area: ArticleArea, signal: AbortSignal): void {
       {
         name: 'get-photography-captions',
         title: 'Get photography captions',
-        description: "List the titles of Yunhao Luo's photographs displayed on the About page. Read-only.",
+        description: 'List the titles of Yunhao Luo’s portfolio photographs.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
         annotations: { readOnlyHint: true, untrustedContentHint: false },
         execute: () => {
