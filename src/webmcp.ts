@@ -12,7 +12,8 @@
  *  - read-only tools carry `annotations.readOnlyHint`
  *  - tools register only in page states where they can succeed, and
  *    unregister (AbortController) when the state changes:
- *      · global: list-site-pages, get-about-me, goto-site-page, set-language
+ *      · global: list-site-pages, get-about-me, goto-site-page, set-language,
+ *        create-portfolio-tour
  *      · home only: walk-hero-to-landmark, get-hero-status
  *      · every article page: get-page-overview, focus-page-section (the same
  *        names are re-registered with page-specific descriptions and schemas)
@@ -80,6 +81,19 @@ interface PageContext {
   sections: readonly PageSection[];
 }
 
+type TourGoal = 'recruiter' | 'research-collaborator' | 'technical-reviewer' | 'creative-explorer' | 'complete-tour';
+interface TourStep {
+  page: 'home' | ArticleArea;
+  section?: string;
+  label: string;
+  reason: string;
+}
+interface TourPlan {
+  title: string;
+  introduction: string;
+  steps: readonly TourStep[];
+}
+
 const PAGE_CONTEXTS: Record<ArticleArea, PageContext> = {
   projects: {
     label: 'Projects / Fluid Simulation',
@@ -135,6 +149,61 @@ const PAGE_CONTEXTS: Record<ArticleArea, PageContext> = {
   },
 };
 
+const TOUR_PLANS: Record<TourGoal, TourPlan> = {
+  recruiter: {
+    title: 'Recruiter tour',
+    introduction: 'A concise route through Yunhao’s background, engineering work, and research.',
+    steps: [
+      { page: 'about', section: 'about-me', label: 'Meet Yunhao', reason: 'Current role, background, and research direction' },
+      { page: 'projects', section: 'system-capabilities', label: 'Review technical work', reason: 'GPU simulation and real-time systems experience' },
+      { page: 'research', section: 'overview', label: 'See published research', reason: 'First-author work and recognition' },
+      { page: 'mods', section: 'overview', label: 'See a shipped creative project', reason: 'Product scope, systems design, and community use' },
+    ],
+  },
+  'research-collaborator': {
+    title: 'Research collaboration tour',
+    introduction: 'A route through research results, collaboration interests, and related technical foundations.',
+    steps: [
+      { page: 'research', section: 'overview', label: 'Read the publication', reason: 'Research topic, paper, video, and award' },
+      { page: 'research', section: 'collaboration', label: 'Explore collaboration', reason: 'Current questions and collaboration direction' },
+      { page: 'projects', section: 'overview', label: 'Inspect applied research', reason: 'Real-time GPU fluid simulation work' },
+      { page: 'about', section: 'about-me', label: 'Review the biography', reason: 'Research trajectory and current focus' },
+    ],
+  },
+  'technical-reviewer': {
+    title: 'Technical reviewer tour',
+    introduction: 'A systems-focused route through implementation details, evidence, and design depth.',
+    steps: [
+      { page: 'projects', section: 'overview', label: 'Start with the simulator', reason: 'Project scope and recorded test scenes' },
+      { page: 'projects', section: 'system-capabilities', label: 'Inspect capabilities', reason: 'Solver, rendering, boundary, and platform details' },
+      { page: 'research', section: 'overview', label: 'Review the research', reason: 'Physics-based control and publication evidence' },
+      { page: 'mods', section: 'mechanic', label: 'Study a game system', reason: 'A complete risk-reward mechanic in a shipped mod' },
+    ],
+  },
+  'creative-explorer': {
+    title: 'Creative explorer tour',
+    introduction: 'A route through the explorable world, writing, game design, and photography.',
+    steps: [
+      { page: 'home', label: 'Explore the dusk world', reason: 'Walk the shared HD-2D portfolio map' },
+      { page: 'zine', section: 'sweet-dreamer', label: 'Read the zine', reason: 'Experimental poetry and interactive form' },
+      { page: 'mods', section: 'mechanic', label: 'Discover Mizuki Mod', reason: 'Character, cards, relics, and original mechanics' },
+      { page: 'about', section: 'interests', label: 'Browse photography', reason: 'Interests and images beyond the technical work' },
+    ],
+  },
+  'complete-tour': {
+    title: 'Complete portfolio tour',
+    introduction: 'A six-stop route across every area of the portfolio.',
+    steps: [
+      { page: 'home', label: 'Home world', reason: 'Learn the map and navigation metaphor' },
+      { page: 'projects', section: 'overview', label: 'Projects', reason: 'Real-time GPU fluid simulation' },
+      { page: 'research', section: 'overview', label: 'Research', reason: 'Publication and collaboration' },
+      { page: 'mods', section: 'overview', label: 'Mods', reason: 'A complete Slay the Spire character' },
+      { page: 'zine', section: 'intro', label: 'The Zine', reason: 'Experimental poetry' },
+      { page: 'about', section: 'about-me', label: 'About', reason: 'Biography, interests, and photography' },
+    ],
+  },
+};
+
 const PAGE_SCOPED_NAMES = new Set([
   'get-page-overview',
   'focus-page-section',
@@ -162,6 +231,7 @@ export function describeTools(): { name: string; summary: string; readOnly: bool
     { name: 'get-about-me', summary: "returns the author's bio (the About page's “About Me”)", readOnly: true },
     { name: 'goto-site-page', summary: `jumps to a page (${AREAS.join(', ')}) — like resting at the bonfire`, readOnly: false },
     { name: 'set-language', summary: `switches the UI language (${LANGS.map((l) => l.id).join(', ')})`, readOnly: false },
+    { name: 'create-portfolio-tour', summary: 'creates a visible, goal-specific route that the visitor and agent can follow together', readOnly: false },
     { name: 'walk-hero-to-landmark', summary: 'walks the pixel hero to a landmark, optionally interacting (only while exploring the home world)', readOnly: false },
     { name: 'get-hero-status', summary: 'reports where the hero stands and what is nearby (only while exploring the home world)', readOnly: true },
     { name: 'get-page-overview', summary: 'returns the current content page as structured JSON; its result changes with the page', readOnly: true },
@@ -175,6 +245,75 @@ export function describeTools(): { name: string; summary: string; readOnly: bool
     { name: 'read-zine-piece', summary: 'returns one poem or section by id (only in The Zine)', readOnly: true },
     { name: 'get-photography-captions', summary: 'lists the photographs on the About page (only on About)', readOnly: true },
   ];
+}
+
+function createPortfolioTour(goal: TourGoal, router: Router): string {
+  const plan = TOUR_PLANS[goal];
+  document.getElementById('portfolio-tour')?.remove();
+
+  const panel = document.createElement('aside');
+  panel.id = 'portfolio-tour';
+  panel.setAttribute('aria-label', plan.title);
+
+  const header = document.createElement('header');
+  const headingGroup = document.createElement('div');
+  const eyebrow = document.createElement('span');
+  eyebrow.className = 'tour-eyebrow';
+  eyebrow.textContent = '✦ Agent-created route';
+  const title = document.createElement('h2');
+  title.textContent = plan.title;
+  headingGroup.append(eyebrow, title);
+  const close = document.createElement('button');
+  close.className = 'tour-close';
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Close portfolio tour');
+  close.textContent = '×';
+  close.addEventListener('click', () => panel.remove());
+  header.append(headingGroup, close);
+
+  const introduction = document.createElement('p');
+  introduction.className = 'tour-intro';
+  introduction.textContent = plan.introduction;
+  const list = document.createElement('ol');
+  const status = document.createElement('p');
+  status.className = 'tour-status';
+  status.setAttribute('aria-live', 'polite');
+  status.textContent = `Shared page: ${router.current?.id ?? 'home'}. Choose a stop to continue.`;
+
+  const buttons: HTMLButtonElement[] = [];
+  let markedCurrentPage = false;
+  for (const [index, step] of plan.steps.entries()) {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.innerHTML = `<span class="tour-number">${index + 1}</span><span><strong>${step.label}</strong><small>${step.reason}</small></span>`;
+    if (!markedCurrentPage && router.current?.id === step.page) {
+      button.classList.add('is-current');
+      markedCurrentPage = true;
+    }
+    button.addEventListener('click', async () => {
+      status.textContent = `Opening ${step.label}…`;
+      const currentPage = router.current?.id ?? 'home';
+      if (currentPage !== step.page) {
+        const moved = await router.go(step.page);
+        if (!moved && router.current?.id !== step.page) {
+          status.textContent = 'The page is already transitioning. Try this stop again in a moment.';
+          return;
+        }
+      }
+      buttons.forEach((candidate) => candidate.classList.remove('is-current'));
+      button.classList.add('is-current');
+      if (step.section && step.page !== 'home') focusPageSection(step.page, step.section);
+      status.textContent = `Now sharing ${step.label}. The visitor and agent are on the same page state.`;
+    });
+    buttons.push(button);
+    item.appendChild(button);
+    list.appendChild(item);
+  }
+
+  panel.append(header, introduction, list, status);
+  document.getElementById('app')?.appendChild(panel);
+  return `Created the visible ${plan.title} with ${plan.steps.length} stops: ${plan.steps.map((step) => step.label).join(' → ')}. The visitor can select any stop in the shared page UI.`;
 }
 
 function updateChip(): void {
@@ -311,6 +450,30 @@ export function initWebMCP(router: Router, home: HomeLevel): void {
       if (getLang() === lang) return `The interface is already in "${lang}".`;
       setLang(lang as Lang);
       return `Interface language switched to "${lang}".`;
+    },
+  });
+
+  void register({
+    name: 'create-portfolio-tour',
+    title: 'Create a portfolio tour',
+    description: 'Create and display a goal-specific portfolio route in the shared page UI. The visitor can click each stop to navigate and focus its relevant section.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        goal: {
+          type: 'string',
+          enum: Object.keys(TOUR_PLANS),
+          description: 'Visitor goal: recruiting, research collaboration, technical review, creative exploration, or the complete portfolio.',
+        },
+      },
+      required: ['goal'],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: false, untrustedContentHint: false },
+    execute: (p: { goal?: string }) => {
+      const goal = String(p?.goal ?? '');
+      if (!Object.hasOwn(TOUR_PLANS, goal)) return `Unknown goal "${goal}". Valid goals: ${Object.keys(TOUR_PLANS).join(', ')}.`;
+      return createPortfolioTour(goal as TourGoal, router);
     },
   });
 

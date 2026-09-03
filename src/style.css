@@ -294,6 +294,91 @@ body { background: transparent; }
   user-select: none;
 }
 #mcp-chip.live { color: var(--soul); border-color: rgba(95,212,255,0.4); text-shadow: 0 0 8px rgba(95,212,255,0.6); }
+
+/* Visible route created by the global create-portfolio-tour WebMCP tool. It
+   lives outside #stage so it survives the same page transitions it controls. */
+#portfolio-tour {
+  position: absolute;
+  right: calc(14px + var(--safe-right));
+  bottom: calc(54px + var(--safe-bottom));
+  z-index: 58;
+  width: min(360px, calc(100vw - 28px - var(--safe-left) - var(--safe-right)));
+  max-height: min(620px, calc(100vh - var(--topbar-h, 70px) - 76px));
+  overflow-y: auto;
+  padding: 18px;
+  color: var(--ink);
+  background: linear-gradient(145deg, rgba(32, 36, 48, 0.96), rgba(8, 10, 16, 0.96));
+  border: 1px solid rgba(201, 169, 89, 0.52);
+  border-radius: 12px;
+  box-shadow: 0 18px 55px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,255,255,0.1);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+#portfolio-tour header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+#portfolio-tour h2 {
+  margin: 2px 0 0;
+  color: #eee9dc;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+}
+.tour-eyebrow {
+  color: var(--soul);
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.tour-close {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  color: var(--ink-dim);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px;
+  font: 20px/1 var(--serif);
+  cursor: pointer;
+}
+.tour-close:hover, .tour-close:focus-visible { color: #fff; border-color: var(--gold); outline: none; }
+.tour-intro { margin: 12px 0; color: var(--ink-dim); font-size: 14px; line-height: 1.35; }
+#portfolio-tour ol { display: grid; gap: 7px; list-style: none; }
+#portfolio-tour li > button {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  color: var(--ink);
+  text-align: left;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+#portfolio-tour li > button:hover,
+#portfolio-tour li > button:focus-visible,
+#portfolio-tour li > button.is-current {
+  background: rgba(95,212,255,0.08);
+  border-color: rgba(95,212,255,0.5);
+  outline: none;
+  transform: translateX(-2px);
+}
+.tour-number { color: var(--gold); font-family: var(--display); font-size: 12px; }
+#portfolio-tour strong { display: block; font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; }
+#portfolio-tour small { display: block; margin-top: 2px; color: var(--ink-dim); font-size: 12px; line-height: 1.2; }
+.tour-status { margin: 11px 0 0; color: var(--soul); font-size: 12px; line-height: 1.25; }
+
+@media (max-width: 520px) {
+  #portfolio-tour {
+    right: calc(8px + var(--safe-right));
+    bottom: calc(8px + var(--safe-bottom));
+    width: calc(100vw - 16px - var(--safe-left) - var(--safe-right));
+  }
+}
 /* same gate as the on-screen joystick (pointer: coarse ⇒ touch-first
    device): where the joystick appears, the chip yields the corner */
 @media (pointer: coarse) {

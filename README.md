@@ -26,7 +26,7 @@ An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub w
 
 | Scope | Tools |
 | --- | --- |
-| Every page | `list-site-pages`, `get-about-me`, `goto-site-page`, `set-language` |
+| Every page | `list-site-pages`, `get-about-me`, `goto-site-page`, `set-language`, `create-portfolio-tour` |
 | Home | `walk-hero-to-landmark`, `get-hero-status` |
 | Every content page | `get-page-overview`, `focus-page-section` — redefined for the current page |
 | Projects | `get-fluid-simulation` |
@@ -35,9 +35,23 @@ An interactive personal website presented as an HD-2D, Souls-inspired JRPG hub w
 | The Zine | `read-zine-piece` |
 | About | `get-photography-captions` |
 
-## WebMCP Challenge Extension
+## WebMCP Challenge Additions — August 25–September 3, 2026
 
 This site predates the OpenAI WebMCP Challenge. The latest pre-challenge baseline is commit [`5acdbc7`](https://github.com/HimeragiYukina/HimeragiYukina.github.io/commit/5acdbc7). Challenge-period work is documented separately in [CHALLENGE.md](CHALLENGE.md), with the Git range `5acdbc7..main` providing timestamped evidence of the new implementation.
+
+| Before the challenge | Added during the challenge |
+| --- | --- |
+| Global tools plus Home and Research tools | A page-aware registry whose tools, schemas, data, and effects follow the mounted page |
+| Agent results were mostly returned out of view | Visible collaboration through section focus/highlighting and a goal-specific portfolio-tour panel |
+| Citation reading and clipboard writing shared one tool | Separate `get-citation` and `copy-citation` responsibilities with paste-ready BibTeX |
+| Basic schemas and lifecycle cleanup | Titles, strict schemas, trust/read annotations, execution cancellation, route cancellation, and Chrome character budgets |
+| Build optimized for Chrome 150 | Build and test coverage extended to the challenge minimum, Chrome 149 |
+
+### Suggested WebMCP tests
+
+1. From any page, ask the agent to call `create-portfolio-tour` for a recruiter, research collaborator, technical reviewer, creative explorer, or complete tour. A visible route appears in the same page; select a stop to navigate and focus the relevant section.
+2. Move between Projects, Research, Mods, The Zine, and About, and inspect the registered tools. `get-page-overview` and `focus-page-section` retain their names while their descriptions and schemas change; exclusive tools appear only where they can succeed.
+3. On Research, compare `get-citation` with `copy-citation`: the former leaves the UI and clipboard unchanged, while the latter copies a complete BibTeX entry suitable for Overleaf.
 
 ## Local Development
 
