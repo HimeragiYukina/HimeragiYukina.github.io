@@ -56,7 +56,7 @@ export function buildTopBar(router: Router, currentId: string): HTMLElement {
   bar.innerHTML = `
     <div class="tb-row tb-row1">
       <div class="tb-id">
-        <img class="hud-avatar" src="${avatarUrl}" alt="Mizuki — avatar of Yunhao Luo">
+        <img class="hud-avatar" src="${avatarUrl}" alt="Mizuki from Arknights — avatar of Yunhao Luo" title="Mizuki © Hypergryph · avatar artwork by QuAn_, freely usable with the artist's permission">
         <div class="tb-name-fold"><div class="hud-name">YUNHAO LUO<small data-i18n="title">${t('title')}</small></div></div>
       </div>
       <nav class="tb-map" aria-label="site map">

@@ -32,14 +32,14 @@ export function makeArticleLevel(
       inner.className = 'article-body';
       render(inner);
       // site-wide credit footer — copyright, the split license, and the
-      // avatar artist (used with permission)
+      // avatar artist permission and the underlying character attribution
       const footer = document.createElement('footer');
       footer.className = 'site-footer';
       footer.innerHTML = `
         <span>© 2026 Yunhao Luo</span>
         <span>Code <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a> ·
           Content <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener">CC BY-NC-ND 4.0</a></span>
-        <span>Avatar by <a href="https://www.pixiv.net/en/users/6657532" target="_blank" rel="noopener">QuAn_</a>, used with permission</span>
+        <span>Mizuki © Hypergryph · avatar art by <a href="https://www.pixiv.net/en/users/6657532" target="_blank" rel="noopener">QuAn_</a>, freely usable with the artist's permission</span>
       `;
       inner.appendChild(footer);
       root.appendChild(inner);

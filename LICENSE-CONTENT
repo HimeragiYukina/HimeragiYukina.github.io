@@ -1,10 +1,9 @@
 Creative content license
 =========================
 
-The creative content of this repository — the photographs in
+The original creative content of this repository — the photographs in
 `src/assets/photography/`, the poetry and prose of the zine
-(`src/levels/zine.ts`), and the procedurally
-generated artwork — is:
+(`src/levels/zine.ts`), and the original environment and effects artwork — is:
 
     © 2026 Yunhao Luo — licensed under
     Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
@@ -17,10 +16,15 @@ modification. All other rights are reserved.
 Third-party assets (NOT covered by the above)
 ----------------------------------------------
 
-- `src/assets/site/mizuki-avatar.jpg` — artwork of Mizuki by QuAn_
-  (https://www.pixiv.net/en/users/6657532), used as an avatar with the
-  artist's permission. It remains the property of QuAn_ and is not
-  licensed for reuse.
+- Mizuki, including the site's generated hero sprite, is a character from
+  Arknights © Hypergryph. Character depictions are excluded from Yunhao Luo's
+  creative-content license.
+
+- `src/assets/site/mizuki-avatar.jpg` — avatar artwork of Mizuki by QuAn_
+  (https://www.pixiv.net/en/users/6657532). The artist has expressly allowed
+  anyone to use this avatar artwork freely. That permission applies to the
+  artwork; Mizuki remains an Arknights character © Hypergryph. The asset is
+  not relicensed under this repository's MIT or CC BY-NC-ND licenses.
 
 - The fluid-simulation videos in `src/assets/fluid-simulation/` were produced by
   Yunhao Luo during research at Ubisoft La Forge and are shared here with
